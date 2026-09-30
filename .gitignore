@@ -1,0 +1,9 @@
+bin/
+obj/
+*.user
+.vs/
+
+# build-installer.ps1 결과물
+installer/publish/
+installer/Output/
+installer/wizard-small.bmp
