@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TaskPack · 작업표시줄에 가방 하나</title>
+  <meta name="description" content="작업표시줄에 고정하는 서랍. 누르면 마비노기 가방처럼 칸이 있는 창이 펼쳐지고, 칸을 한 번 누르면 프로그램이 실행됩니다. Windows용, 무료, MIT.">
+  <meta property="og:title" content="TaskPack · 작업표시줄에 가방 하나">
+  <meta property="og:description" content="누르면 펼쳐지는 작업표시줄 서랍. 프로그램을 가방에 넣고 한 번에 꺼내 쓰세요.">
+  <meta property="og:image" content="icon.png">
+  <meta name="theme-color" content="#0F9A87">
+  <link rel="icon" href="favicon.ico">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="top">
+    <a class="brand" href="#">
+      <img src="icon.png" alt="" width="30" height="30">
+      <span>TaskPack</span>
+    </a>
+    <nav>
+      <a href="#features">기능</a>
+      <a href="#install">설치</a>
+      <a href="#faq">질문</a>
+      <a href="https://github.com/pomeloEater/TaskPack" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </header>
+
+  <main>
+    <!-- 첫 화면 -->
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow reveal">Windows 작업표시줄 서랍</p>
+        <h1 class="reveal">작업표시줄에<br><span class="mark">가방</span> 하나.</h1>
+        <p class="lead reveal">서랍 아이콘을 누르면 마비노기 가방처럼 칸이 펼쳐집니다.<br>
+          자주 쓰는 프로그램을 넣어 두고, 칸을 한 번 누르면 실행됩니다.</p>
+        <div class="cta reveal">
+          <a id="download" class="btn primary" href="https://github.com/pomeloEater/TaskPack/releases/latest">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 19h16" /></svg>
+            <span>Windows용 내려받기</span>
+          </a>
+          <a class="btn ghost" href="https://github.com/pomeloEater/TaskPack" target="_blank" rel="noopener">GitHub에서 보기</a>
+        </div>
+        <p id="download-meta" class="meta reveal">무료 · MIT 라이선스 · Windows 10/11 64비트</p>
+      </div>
+
+      <!-- 직접 눌러 보는 미리보기 -->
+      <div class="demo reveal" aria-label="TaskPack 미리보기">
+        <span class="sticker">아버지가방에<br>들어가신다</span>
+        <div class="desk">
+          <div class="bag" id="bag" data-theme="custom" aria-hidden="true">
+            <div class="bag-head">
+              <button class="pin" id="pin" title="고정: 켜면 바깥을 눌러도 닫히지 않아요" aria-pressed="false">
+                <svg viewBox="0 0 24 24"><path d="M15 3l6 6-3 1-4 4 1 5-2 2-4-4-5 5-1-1 5-5-4-4 2-2 5 1 4-4z" /></svg>
+              </button>
+              <div class="tabs" role="tablist">
+                <button class="tab" data-theme="dark">작업</button>
+                <button class="tab active" data-theme="custom">게임</button>
+                <button class="tab" data-theme="light">공부</button>
+                <span class="tab add">+ 새 가방</span>
+              </div>
+            </div>
+            <div class="grid" id="grid"></div>
+          </div>
+          <p class="toast" id="toast" role="status"></p>
+          <div class="taskbar">
+            <span class="tb-item start"><i></i><i></i><i></i><i></i></span>
+            <span class="tb-item search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6" /><path d="m20 20-4.5-4.5" /></svg></span>
+            <span class="tb-item plain"></span>
+            <button class="tb-item drawer" id="drawer" title="TaskPack 서랍 (눌러 보세요)">
+              <img src="icon.png" alt="TaskPack 서랍">
+            </button>
+            <span class="tb-item plain"></span>
+          </div>
+        </div>
+        <p class="demo-hint">↑ 작업표시줄의 서랍을 눌러 보세요</p>
+      </div>
+    </section>
+
+    <!-- 기능 -->
+    <section id="features" class="section">
+      <h2>가방에 넣고, 한 번에 꺼내 쓰기</h2>
+      <p class="section-lead">바탕화면을 치우고 작업표시줄을 비워도 쓰던 프로그램은 그대로 손 닿는 곳에.</p>
+      <div class="features">
+        <article class="slot-card">
+          <div class="slot-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2" /><rect x="14" y="3" width="7" height="7" rx="2" /><rect x="3" y="14" width="7" height="7" rx="2" /><rect x="14" y="14" width="7" height="7" rx="2" /></svg></div>
+          <h3>자유 배치 칸</h3>
+          <p>가방 크기는 1×1부터 12×12까지. 원하는 칸에 끌어다 두고, 칸끼리 끌어서 자리를 바꿉니다.</p>
+        </article>
+        <article class="slot-card">
+          <div class="slot-icon"><svg viewBox="0 0 24 24"><path d="M4 7h6l2 2h8v10H4z" /><path d="M4 7V5h6" /></svg></div>
+          <h3>탭으로 가방 여러 개</h3>
+          <p>작업용, 게임용, 공부용. 탭을 더블클릭해 이름을 바꾸고, 끌어서 순서를 바꿉니다.</p>
+        </article>
+        <article class="slot-card">
+          <div class="slot-icon"><svg viewBox="0 0 24 24"><path d="M12 3v12m0 0-4-4m4 4 4-4" /><rect x="4" y="16" width="16" height="5" rx="2" /></svg></div>
+          <h3>끌어서 넣기</h3>
+          <p>탐색기의 파일·폴더·바로가기, 시작 메뉴의 앱까지. 작업표시줄에 고정된 앱은 체크만 하면 들어갑니다.</p>
+        </article>
+        <article class="slot-card">
+          <div class="slot-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" /><path d="M12 4a8 8 0 0 0 0 16z" /></svg></div>
+          <h3>가방마다 다른 색</h3>
+          <p>시스템·라이트·다크, 또는 원하는 색으로. 글자색은 배경 밝기에 맞춰 알아서 바뀝니다.</p>
+        </article>
+        <article class="slot-card">
+          <div class="slot-icon"><svg viewBox="0 0 24 24"><rect x="3" y="15" width="18" height="5" rx="1.5" /><path d="M12 12V4m0 0-3 3m3-3 3 3" /></svg></div>
+          <h3>작업표시줄 옆에 착</h3>
+          <p>작업표시줄이 아래면 위로, 옆이면 옆으로 펼쳐집니다. 다시 누르거나 바깥을 누르면 닫힙니다.</p>
+        </article>
+        <article class="slot-card">
+          <div class="slot-icon"><svg viewBox="0 0 24 24"><path d="M5 4h11l3 3v13H5z" /><path d="M8 4v5h7V4M8 20v-6h8v6" /></svg></div>
+          <h3>zip 하나로 백업</h3>
+          <p>가방, 탭 아이콘, 서랍 아이콘까지 파일 하나로 내보내고 새 PC에서 그대로 되살립니다.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- 설치 -->
+    <section id="install" class="section">
+      <h2>설치는 세 번이면 끝</h2>
+      <ol class="steps">
+        <li>
+          <span class="step-no">1</span>
+          <h3>내려받기</h3>
+          <p><a class="inline-download" href="https://github.com/pomeloEater/TaskPack/releases/latest">TaskPack 설치 파일</a>을 내려받습니다.
+            <a href="https://dotnet.microsoft.com/download/dotnet/8.0" target="_blank" rel="noopener">.NET 8 데스크톱 런타임</a>이 필요하며, 없으면 설치 프로그램이 알려 줍니다.</p>
+        </li>
+        <li>
+          <span class="step-no">2</span>
+          <h3>설치하기</h3>
+          <p>설치 경로와 바탕화면 아이콘을 고릅니다. 관리자 권한 없이 내 계정에 설치됩니다.</p>
+        </li>
+        <li>
+          <span class="step-no">3</span>
+          <h3>작업표시줄에 고정</h3>
+          <p>시작 메뉴에서 TaskPack을 우클릭 → <b>작업 표시줄에 고정</b>. Windows가 자동 고정을 막아서 이것만 직접 해 주세요.</p>
+        </li>
+      </ol>
+      <p class="notice">설치 파일에 전자 서명이 없어 "Windows의 PC 보호" 창이 뜰 수 있어요. <b>추가 정보 → 실행</b>을 누르면 됩니다.</p>
+    </section>
+
+    <!-- 질문 -->
+    <section id="faq" class="section">
+      <h2>자주 묻는 질문</h2>
+      <div class="faq">
+        <details>
+          <summary>정말 무료인가요?</summary>
+          <p>네. MIT 라이선스로 공개한 오픈소스입니다. 개인·회사 모두 무료로 쓰고, 코드를 고쳐 써도 됩니다.</p>
+        </details>
+        <details>
+          <summary>왜 작업표시줄 고정을 직접 해야 하나요?</summary>
+          <p>Windows 10부터 프로그램이 스스로 작업표시줄에 고정하는 것을 막고 있습니다. 한 번만 고정하면 이후로는 서랍 아이콘으로 바로 열립니다.</p>
+        </details>
+        <details>
+          <summary>가방에 넣은 파일은 복사되나요?</summary>
+          <p>아니요. 경로만 기억합니다. 원본을 옮기거나 지우면 칸이 흐리게 보여서 알 수 있습니다. 작업표시줄에서 가져온 앱만 바로가기를 가방 폴더에 복사해 둡니다.</p>
+        </details>
+        <details>
+          <summary>가방 정보는 어디에 저장되나요?</summary>
+          <p>내 PC의 <code>%APPDATA%\TaskPack</code> 폴더에만 저장되고, 어디로도 보내지 않습니다. 프로그램을 지울 때 가방 데이터를 남길지 물어봅니다.</p>
+        </details>
+        <details>
+          <summary>이름이 왜 "아버지가방에들어가신다"예요?</summary>
+          <p>띄어쓰기를 잘못하면 아버지가 가방에 들어가시거든요. 아이콘의 서류가방 앞 구두도 그래서 있습니다.</p>
+        </details>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p>© 2026 TaskPack.</p>
+    <p>
+      <a href="https://github.com/pomeloEater/TaskPack/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a> ·
+      글꼴 <a href="https://github.com/orioncactus/pretendard" target="_blank" rel="noopener">Pretendard</a> (SIL OFL 1.1) ·
+      <a href="https://github.com/pomeloEater/TaskPack" target="_blank" rel="noopener">GitHub</a>
+    </p>
+  </footer>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
