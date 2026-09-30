@@ -11,14 +11,14 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyName>TaskPack</AssemblyName>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <RootNamespace>TaskPack</RootNamespace>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <!-- tools\make-icon.ps1 로 만든 서류가방 + 구두 아이콘 -->
     <ApplicationIcon>assets\TaskPack.ico</ApplicationIcon>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <SelfContained>false</SelfContained>
-    <!-- 미리 컴파일해 두어 서랍을 누른 뒤 가방이 뜨는 시간을 줄인다 -->
+    <!-- 미리 컴파일해 두어 작업표시줄 아이콘을 누른 뒤 가방이 뜨는 시간을 줄인다 -->
     <PublishReadyToRun>true</PublishReadyToRun>
   </PropertyGroup>
 

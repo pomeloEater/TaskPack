@@ -24,7 +24,7 @@ public partial class BagWindow : Window
     private const int ScreenGap = 8;            // 작업표시줄·화면 가장자리와 띄울 거리 (DIP)
     private const int ErrorCancelled = 1223;    // 사용자가 권한 확인 창(UAC)에서 취소
 
-    // 포커스를 잃고 숨은 뒤 이 시간 동안은 "서랍 아이콘 재클릭"으로 보고 다시 열지 않는다
+    // 포커스를 잃고 숨은 뒤 이 시간 동안은 "작업표시줄 아이콘 재클릭"으로 보고 다시 열지 않는다
     private static readonly TimeSpan ReopenGrace = TimeSpan.FromMilliseconds(400);
 
     // 열고 닫을 때 미끄러지는 거리(DIP)와 시간
@@ -67,7 +67,7 @@ public partial class BagWindow : Window
         if (openSettings)
             _modalDepth++; // 설정 창이 뜨기 전에 포커스를 잃어도 닫히지 않게 (OpenSettings에서 푼다)
 
-        // 다른 TaskPack 프로세스가 신호를 보내면(서랍 아이콘 재클릭) 닫는다
+        // 다른 TaskPack 프로세스가 신호를 보내면(작업표시줄 아이콘 재클릭) 닫는다
         _signal = new EventWaitHandle(false, EventResetMode.AutoReset, SignalName);
         _signalWait = ThreadPool.RegisterWaitForSingleObject(_signal,
             (_, _) => Dispatcher.InvokeAsync(CloseBag), null, Timeout.Infinite, executeOnlyOnce: true);
@@ -107,7 +107,7 @@ public partial class BagWindow : Window
         SizeChanged += (_, _) => { if (_placed) Reposition(); };
         DpiChanged += (_, _) => Dispatcher.InvokeAsync(Reposition, DispatcherPriority.Loaded);
         Deactivated += OnDeactivated;
-        // 작업표시줄에서 최소화되면(서랍 아이콘 클릭, Win+D 등) 닫는다
+        // 작업표시줄에서 최소화되면(작업표시줄 아이콘 클릭, Win+D 등) 닫는다
         StateChanged += (_, _) => { if (WindowState == WindowState.Minimized) CloseBag(); };
         KeyDown += (_, e) => { if (e.Key == Key.Escape) CloseBag(); };
         Closed += (_, _) =>
@@ -126,7 +126,7 @@ public partial class BagWindow : Window
             return;
 
         // 바로 끝내지 않고 숨긴 채 잠깐 기다린다.
-        // 서랍 아이콘을 눌러 포커스를 잃은 경우, 새로 뜬 프로세스가 이 창의 신호를 보고 그냥 종료하게 하기 위해서다.
+        // 작업표시줄 아이콘을 눌러 포커스를 잃은 경우, 새로 뜬 프로세스가 이 창의 신호를 보고 그냥 종료하게 하기 위해서다.
         CommitEdit();
         _closing = true;
         AnimateOut(Hide);

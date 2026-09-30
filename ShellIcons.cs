@@ -60,7 +60,7 @@ internal static class ShellIcons
         }
     }
 
-    // 탭·서랍 아이콘 표시용. exe·dll은 그 파일의 아이콘, ico·그림은 가장 큰 이미지. 읽지 못하면 null
+    // 탭·작업표시줄 아이콘 표시용. exe·dll은 그 파일의 아이콘, ico·그림은 가장 큰 이미지. 읽지 못하면 null
     public static ImageSource? LoadIconFile(string path)
     {
         if (!File.Exists(path))

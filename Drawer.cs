@@ -4,7 +4,8 @@ using static TaskPack.NativeMethods;
 
 namespace TaskPack;
 
-// 작업표시줄의 "서랍" = TaskPack 창을 여는 바로가기와 그 아이콘
+// 작업표시줄의 가방 아이콘 = TaskPack 창을 여는 바로가기와 그 아이콘.
+// 클래스 이름과 식별자(TaskPack.Drawer)는 이미 고정된 바로가기가 쓰고 있어 바꾸지 않는다
 internal static class Drawer
 {
     public const string AppId = "TaskPack.Drawer";
@@ -16,7 +17,7 @@ internal static class Drawer
     public static string ExePath => Environment.ProcessPath
         ?? throw new InvalidOperationException("TaskPack.exe 위치를 알 수 없습니다.");
 
-    // 지금 서랍 아이콘 파일 (설정이 없거나 파일이 사라졌으면 TaskPack.exe)
+    // 지금 작업표시줄 아이콘 파일 (설정이 없거나 파일이 사라졌으면 TaskPack.exe)
     public static string IconPath(DrawerConfig config)
     {
         if (config.DrawerIcon is { } stored)
@@ -44,7 +45,7 @@ internal static class Drawer
             return CommonStartMenuLink;
 
         Directory.CreateDirectory(Path.GetDirectoryName(StartMenuLink)!);
-        ShellLink.Create(StartMenuLink, ExePath, "", IconPath(config), 0, AppId, "TaskPack 서랍");
+        ShellLink.Create(StartMenuLink, ExePath, "", IconPath(config), 0, AppId, "TaskPack 가방");
         return StartMenuLink;
     }
 
@@ -66,7 +67,7 @@ internal static class Drawer
         return updated;
     }
 
-    // 시작 메뉴 바로가기와 고정된 복사본 중 서랍 식별자를 가진 것의 아이콘을 지금 설정으로 맞춘다
+    // 시작 메뉴 바로가기와 고정된 복사본 중 TaskPack 식별자를 가진 것의 아이콘을 지금 설정으로 맞춘다
     public static int RefreshShortcuts(DrawerConfig config)
     {
         var icon = IconPath(config);

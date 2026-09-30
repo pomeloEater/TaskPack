@@ -112,18 +112,18 @@
                 </Grid>
             </DockPanel>
 
-            <!-- 기본 설정: 서랍 + 화면 -->
+            <!-- 기본 설정: 작업표시줄 아이콘 + 화면 -->
             <ScrollViewer x:Name="GeneralPage" VerticalScrollBarVisibility="Auto">
                 <StackPanel Margin="0,0,10,0">
                     <TextBlock Text="기본 설정" Style="{StaticResource PageTitle}"/>
-                    <TextBlock Text="작업표시줄에 고정하는 서랍 아이콘과 모든 가방의 기본 테마를 정합니다." Style="{StaticResource PageSubtitle}"/>
+                    <TextBlock Text="작업표시줄에 고정하는 가방 아이콘과 모든 가방의 기본 테마를 정합니다." Style="{StaticResource PageSubtitle}"/>
                     <Border Style="{StaticResource Card}">
                         <StackPanel Orientation="Horizontal">
                             <Border Width="72" Height="72" CornerRadius="12" Background="{DynamicResource SlotHoverBrush}" Margin="0,0,16,0">
                                 <Image x:Name="DrawerIconImage" Width="48" Height="48" RenderOptions.BitmapScalingMode="HighQuality"/>
                             </Border>
                             <StackPanel VerticalAlignment="Center">
-                                <TextBlock Text="서랍 아이콘" Style="{StaticResource FieldLabel}"/>
+                                <TextBlock Text="작업표시줄 아이콘" Style="{StaticResource FieldLabel}"/>
                                 <StackPanel Orientation="Horizontal">
                                     <Button Content="아이콘 바꾸기…" Style="{StaticResource SecondaryButton}" Padding="12,6" Click="ChangeDrawerIcon_Click"/>
                                     <Button x:Name="ResetDrawerIconButton" Content="기본 아이콘" Style="{StaticResource SecondaryButton}" Padding="12,6"
@@ -156,7 +156,7 @@
             <!-- 백업 -->
             <StackPanel x:Name="BackupPage" Visibility="Collapsed">
                 <TextBlock Text="백업" Style="{StaticResource PageTitle}"/>
-                <TextBlock Text="모든 가방의 칸, 탭 아이콘, 서랍 아이콘을 zip 파일 하나로 저장하고 되살립니다."
+                <TextBlock Text="모든 가방의 칸, 탭 아이콘, 작업표시줄 아이콘을 zip 파일 하나로 저장하고 되살립니다."
                            Style="{StaticResource PageSubtitle}"/>
                 <Border Style="{StaticResource Card}">
                     <StackPanel>

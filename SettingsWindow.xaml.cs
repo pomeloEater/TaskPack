@@ -366,7 +366,7 @@ public partial class SettingsWindow : Window
         }
     }
 
-    // ───────────── 서랍 ─────────────
+    // ───────────── 작업표시줄 아이콘 ─────────────
 
     private void RefreshDrawer()
     {
@@ -379,7 +379,7 @@ public partial class SettingsWindow : Window
 
     private void ChangeDrawerIcon_Click(object sender, RoutedEventArgs e)
     {
-        var dialog = new OpenFileDialog { Title = "서랍 아이콘 고르기", Filter = IconFile.DialogFilter };
+        var dialog = new OpenFileDialog { Title = "작업표시줄 아이콘 고르기", Filter = IconFile.DialogFilter };
         if (dialog.ShowDialog(this) == true)
             ApplyDrawerIcon(dialog.FileName);
     }
@@ -400,7 +400,7 @@ public partial class SettingsWindow : Window
         }
         RefreshDrawer();
         if (updated > 0)
-            ShowMessage("서랍 아이콘을 바꿨습니다.\n작업표시줄에 바로 보이지 않으면 고정을 풀었다가 다시 고정해 주세요.", MessageBoxImage.Information);
+            ShowMessage("작업표시줄 아이콘을 바꿨습니다.\n작업표시줄에 바로 보이지 않으면 고정을 풀었다가 다시 고정해 주세요.", MessageBoxImage.Information);
     }
 
     private void Pin_Click(object sender, RoutedEventArgs e)

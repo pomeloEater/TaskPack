@@ -6,7 +6,7 @@
 #endif
 #define AppName "TaskPack"
 #define AppExe "TaskPack.exe"
-; 작업표시줄에서 서랍 아이콘 아래에 "실행 중"으로 묶이려면 바로가기와 프로그램이 같은 식별자를 써야 한다 (Drawer.AppId)
+; 작업표시줄에서 TaskPack 아이콘 아래에 "실행 중"으로 묶이려면 바로가기와 프로그램이 같은 식별자를 써야 한다 (Drawer.AppId)
 #define AppUserModelId "TaskPack.Drawer"
 #define PublishDir "publish"
 

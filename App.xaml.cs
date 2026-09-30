@@ -10,7 +10,7 @@ public partial class App : Application
     {
         base.OnStartup(e);
 
-        // 서랍이 이미 열려 있으면(서랍 아이콘을 다시 누른 경우) 닫으라는 신호만 보내고 끝낸다
+        // 가방이 이미 열려 있으면(작업표시줄 아이콘을 다시 누른 경우) 닫으라는 신호만 보내고 끝낸다
         if (EventWaitHandle.TryOpenExisting(BagWindow.SignalName, out var signal))
         {
             signal.Set();
@@ -19,7 +19,7 @@ public partial class App : Application
             return;
         }
 
-        // 고정한 서랍 바로가기와 같은 식별자를 써야 작업표시줄에서 서랍 아이콘 아래에 "실행 중"으로 묶인다
+        // 고정한 작업표시줄 바로가기와 같은 식별자를 써야 작업표시줄 아이콘 아래에 "실행 중"으로 묶인다
         NativeMethods.SetCurrentProcessExplicitAppUserModelID(Drawer.AppId);
 
         var firstRun = BagStore.IsFirstRun; // LoadConfig가 설정 파일을 만들기 전에 확인
