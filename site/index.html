@@ -4,10 +4,15 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>TaskPack · 작업표시줄에 가방 하나</title>
-  <meta name="description" content="작업표시줄에 고정하는 서랍. 누르면 마비노기 가방처럼 칸이 있는 창이 펼쳐지고, 칸을 한 번 누르면 프로그램이 실행됩니다. Windows용, 무료, MIT.">
+  <meta name="description" content="작업표시줄에 고정하는 가방. 누르면 마비노기 가방처럼 칸이 펼쳐지고, 칸을 한 번 누르면 프로그램이 실행됩니다. Windows용, 무료, MIT.">
   <meta property="og:title" content="TaskPack · 작업표시줄에 가방 하나">
-  <meta property="og:description" content="누르면 펼쳐지는 작업표시줄 서랍. 프로그램을 가방에 넣고 한 번에 꺼내 쓰세요.">
-  <meta property="og:image" content="icon.png">
+  <meta property="og:description" content="누르면 펼쳐지는 작업표시줄 가방. 프로그램을 넣어 두고 한 번에 꺼내 쓰세요.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://taskpack.vercel.app/">
+  <meta property="og:image" content="https://taskpack.vercel.app/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
   <meta name="theme-color" content="#0F9A87">
   <link rel="icon" href="favicon.ico">
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
@@ -32,9 +37,9 @@
     <!-- 첫 화면 -->
     <section class="hero">
       <div class="hero-copy">
-        <p class="eyebrow reveal">Windows 작업표시줄 서랍</p>
+        <p class="eyebrow reveal">Windows 작업표시줄 가방</p>
         <h1 class="reveal">작업표시줄에<br><span class="mark">가방</span> 하나.</h1>
-        <p class="lead reveal">서랍 아이콘을 누르면 마비노기 가방처럼 칸이 펼쳐집니다.<br>
+        <p class="lead reveal">작업표시줄의 가방 아이콘을 누르면 마비노기 가방처럼 칸이 펼쳐집니다.<br>
           자주 쓰는 프로그램을 넣어 두고, 칸을 한 번 누르면 실행됩니다.</p>
         <div class="cta reveal">
           <a id="download" class="btn primary" href="https://github.com/pomeloEater/TaskPack/releases/latest">
@@ -69,13 +74,13 @@
             <span class="tb-item start"><i></i><i></i><i></i><i></i></span>
             <span class="tb-item search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6" /><path d="m20 20-4.5-4.5" /></svg></span>
             <span class="tb-item plain"></span>
-            <button class="tb-item drawer" id="drawer" title="TaskPack 서랍 (눌러 보세요)">
-              <img src="icon.png" alt="TaskPack 서랍">
+            <button class="tb-item drawer" id="drawer" title="TaskPack 가방 (눌러 보세요)">
+              <img src="icon.png" alt="TaskPack 가방 아이콘">
             </button>
             <span class="tb-item plain"></span>
           </div>
         </div>
-        <p class="demo-hint">↑ 작업표시줄의 서랍을 눌러 보세요</p>
+        <p class="demo-hint">↑ 작업표시줄의 가방 아이콘을 눌러 보세요</p>
       </div>
     </section>
 
@@ -112,7 +117,7 @@
         <article class="slot-card">
           <div class="slot-icon"><svg viewBox="0 0 24 24"><path d="M5 4h11l3 3v13H5z" /><path d="M8 4v5h7V4M8 20v-6h8v6" /></svg></div>
           <h3>zip 하나로 백업</h3>
-          <p>가방, 탭 아이콘, 서랍 아이콘까지 파일 하나로 내보내고 새 PC에서 그대로 되살립니다.</p>
+          <p>가방과 탭 아이콘, 작업표시줄 아이콘까지 파일 하나로 내보내고 새 PC에서 그대로 되살립니다.</p>
         </article>
       </div>
     </section>
@@ -151,7 +156,7 @@
         </details>
         <details>
           <summary>왜 작업표시줄 고정을 직접 해야 하나요?</summary>
-          <p>Windows 10부터 프로그램이 스스로 작업표시줄에 고정하는 것을 막고 있습니다. 한 번만 고정하면 이후로는 서랍 아이콘으로 바로 열립니다.</p>
+          <p>Windows 10부터 프로그램이 스스로 작업표시줄에 고정하는 것을 막고 있습니다. 한 번만 고정하면 이후로는 작업표시줄의 가방 아이콘으로 바로 열립니다.</p>
         </details>
         <details>
           <summary>가방에 넣은 파일은 복사되나요?</summary>

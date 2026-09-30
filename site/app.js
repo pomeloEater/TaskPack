@@ -89,7 +89,7 @@
   });
 
   renderSlots(bag.dataset.theme);
-  // 처음엔 한 번 열어 보여 주고, 서랍 아이콘을 눌러 보라고 살짝 두근거리게 한다
+  // 처음엔 한 번 열어 보여 주고, 가방 아이콘을 눌러 보라고 살짝 두근거리게 한다
   setTimeout(() => setOpen(true), reduceMotion ? 0 : 900);
   setTimeout(() => drawer.classList.add('nudge'), 2600);
 

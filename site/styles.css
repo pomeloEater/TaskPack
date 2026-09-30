@@ -156,7 +156,7 @@ h1 {
 .bag {
   --bag-bg: #3E63DD; --bag-ink: #fff; --bag-slot: rgba(255, 255, 255, .09); --bag-slot-hover: rgba(255, 255, 255, .19);
   --bag-accent: #9DB2F0; --bag-accent-ink: #1A1A1A; --bag-sel: rgba(255, 255, 255, .22);
-  /* 서랍 아이콘(작업표시줄 가운데에서 오른쪽으로 46px) 바로 위에 가운데 맞춤 */
+  /* 가방 아이콘(작업표시줄 가운데에서 오른쪽으로 46px) 바로 위에 가운데 맞춤 */
   position: absolute; bottom: 62px; left: 50%; width: 300px; margin-left: -104px;
   padding: 8px 8px 10px; border-radius: 10px;
   background: var(--bag-bg); color: var(--bag-ink);
