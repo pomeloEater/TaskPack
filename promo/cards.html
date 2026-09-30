@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>TaskPack 카드뉴스</title>
+<!-- render.ps1 이 주소 뒤 #ig-1 ~ #ig-5, #x, #og 로 한 장씩 찍는다 -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+  :root { --paper: #F4EFE6; --grid: rgba(28,26,23,.06); --ink: #1C1A17; --muted: #6B645B; --line: #E3DACB;
+          --teal: #0F9A87; --leather: #B5541A; --card: #FFFDF9; }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { width: 100%; height: 100%; overflow: hidden; }
+  body { font-family: Pretendard, "Pretendard Variable", "Malgun Gothic", sans-serif; color: var(--ink); word-break: keep-all; -webkit-font-smoothing: antialiased; }
+  .card { color: var(--ink); position: relative; width: 100vw; height: 100vh; overflow: hidden; background: var(--paper);
+          background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+          background-size: 54px 54px; background-position: -1px -1px; }
+  .card.dark { --paper: #14171A; --grid: rgba(242,239,234,.05); --ink: #F2EFEA; --muted: #A39E96; --line: #2B2F34; --teal: #1CC2A6; --leather: #E3844A; }
+  .card.teal { --paper: #0F9A87; --grid: rgba(255,255,255,.08); --ink: #fff; --muted: rgba(255,255,255,.8); }
+
+  /* 공통 머리·바닥 */
+  .brand { position: absolute; top: 64px; left: 80px; display: flex; align-items: center; gap: 14px; font-weight: 800; font-size: 34px; letter-spacing: -.02em; }
+  .brand img { width: 48px; height: 48px; }
+  .page { position: absolute; top: 72px; right: 80px; font-size: 26px; font-weight: 700; color: var(--muted); }
+  .url { position: absolute; bottom: 64px; left: 80px; font-size: 28px; font-weight: 700; color: var(--muted); }
+
+  h1 { font-size: 112px; line-height: 1.08; font-weight: 900; letter-spacing: -.05em; }
+  h2 { font-size: 92px; line-height: 1.12; font-weight: 900; letter-spacing: -.05em; }
+  .mark { color: var(--teal); background: linear-gradient(transparent 70%, color-mix(in srgb, var(--leather) 30%, transparent) 0); }
+  .sub { margin-top: 28px; font-size: 38px; line-height: 1.45; color: var(--muted); font-weight: 500; }
+  .copy { position: absolute; left: 80px; right: 80px; top: 190px; }
+  .sticker { position: absolute; padding: 18px 26px; background: var(--leather); color: #fff; border-radius: 18px; transform: rotate(6deg);
+             font-weight: 850; font-size: 34px; line-height: 1.25; letter-spacing: -.02em; box-shadow: 0 18px 30px -12px rgba(0,0,0,.35); }
+
+  /* 바탕화면 + 작업표시줄 + 가방 (홈페이지 미리보기와 같은 모양) */
+  .desk { position: absolute; border-radius: 34px; overflow: hidden; box-shadow: 0 30px 60px -24px rgba(60,40,20,.45);
+          background: radial-gradient(120% 90% at 10% 0%, rgba(15,154,135,.6), transparent 60%),
+                      radial-gradient(90% 80% at 100% 100%, rgba(181,84,26,.5), transparent 60%),
+                      linear-gradient(160deg, #26343A, #1B2226); }
+  .taskbar { position: absolute; left: 0; right: 0; bottom: 0; height: 92px; display: flex; align-items: center; justify-content: center; gap: 12px;
+             background: rgba(22,24,27,.82); border-top: 1px solid rgba(255,255,255,.08); }
+  .tb { width: 68px; height: 68px; border-radius: 14px; display: grid; place-items: center; position: relative; font-size: 34px; }
+  .tb.plain::before { content: ""; width: 38px; height: 38px; border-radius: 10px; background: rgba(255,255,255,.16); }
+  .tb.start { grid-template-columns: repeat(2, 15px); gap: 4px; place-content: center; }
+  .tb.start i { width: 15px; height: 15px; border-radius: 3px; background: #5BA8F5; }
+  .tb.drawer { background: rgba(255,255,255,.1); }
+  .tb.drawer img { width: 48px; height: 48px; }
+  .tb.drawer::after { content: ""; position: absolute; bottom: 4px; left: 50%; width: 26px; margin-left: -13px; height: 5px; border-radius: 3px; background: #5BA8F5; }
+  .tb.ring { box-shadow: 0 0 0 8px rgba(28,194,166,.45); }
+
+  .bag { position: relative; padding: calc(14px*var(--k,1)) calc(14px*var(--k,1)) calc(16px*var(--k,1)); border-radius: calc(18px*var(--k,1)); background: var(--b); color: var(--bi);
+         box-shadow: 0 30px 60px -18px rgba(0,0,0,.6), 0 0 0 1.5px rgba(255,255,255,.12); }
+  .bag.blue { --b: #3E63DD; --bi: #fff; --s: rgba(255,255,255,.09); --sel: rgba(255,255,255,.22); }
+  .bag.dark { --b: #262626; --bi: #F0F0F0; --s: rgba(255,255,255,.086); --sel: rgba(255,255,255,.22); }
+  .bag.light { --b: #F7F7F7; --bi: #1A1A1A; --s: rgba(0,0,0,.055); --sel: rgba(0,0,0,.13); }
+  .bag.red { --b: #E5484D; --bi: #fff; --s: rgba(255,255,255,.1); --sel: rgba(255,255,255,.24); }
+  .bag-head { display: flex; gap: 4px; align-items: center; margin-bottom: calc(12px*var(--k,1)); font-size: calc(22px*var(--k,1)); }
+  .bag-head .pin { width: calc(44px*var(--k,1)); height: calc(40px*var(--k,1)); border-radius: 10px; display: grid; place-items: center; font-size: 1em; opacity: .8; }
+  .bag-head span { padding: calc(6px*var(--k,1)) calc(14px*var(--k,1)); border-radius: 10px; white-space: nowrap; }
+  .bag-head span.on { background: var(--sel); font-weight: 700; }
+  .bag-head span.add { opacity: .6; font-size: .9em; }
+  .slots { display: grid; gap: calc(7px*var(--k,1)); }
+  .slot { min-width: 0; border-radius: calc(12px*var(--k,1)); background: var(--s); aspect-ratio: 80 / 84; display: flex; flex-direction: column; align-items: center; padding-top: calc(18px*var(--k,1)); gap: calc(8px*var(--k,1)); font-size: calc(20px*var(--k,1)); font-weight: 500; }
+  .slot .ico { width: calc(56px*var(--k,1)); height: calc(56px*var(--k,1)); border-radius: calc(15px*var(--k,1)); display: grid; place-items: center; font-size: calc(31px*var(--k,1)); box-shadow: inset 0 -3px 0 rgba(0,0,0,.12); }
+
+  /* 문제 장: 아이콘 밭 */
+  .mess { position: absolute; inset: 0; }
+  .mess .ico { position: absolute; width: 76px; height: 76px; border-radius: 20px; display: grid; place-items: center; font-size: 40px; box-shadow: 0 8px 16px -8px rgba(0,0,0,.5); }
+
+  /* 해결 장: 단계 표시 */
+  .steps { position: absolute; left: 80px; right: 80px; bottom: 150px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .step { background: var(--card); border: 1.5px solid var(--line); border-radius: 26px; padding: 28px 30px; font-size: 32px; font-weight: 700; line-height: 1.35; }
+  .step b { display: inline-grid; place-items: center; width: 50px; height: 50px; border-radius: 14px; background: var(--ink); color: var(--paper); margin-bottom: 14px; font-size: 28px; }
+  .step small { display: block; margin-top: 6px; font-size: 26px; font-weight: 500; color: var(--muted); }
+
+  /* 기능 장 */
+  .feats { position: absolute; left: 80px; right: 80px; top: 470px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .feat { background: var(--card); border: 1.5px solid var(--line); border-radius: 28px; padding: 34px; min-height: 300px; }
+  .feat .fi { width: 78px; height: 78px; border-radius: 20px; display: grid; place-items: center; font-size: 40px; margin-bottom: 22px; background: color-mix(in srgb, var(--teal) 15%, transparent); }
+  .feat:nth-child(even) .fi { background: color-mix(in srgb, var(--leather) 15%, transparent); }
+  .feat h3 { font-size: 38px; font-weight: 850; letter-spacing: -.03em; margin-bottom: 10px; }
+  .feat p { font-size: 27px; line-height: 1.45; color: var(--muted); }
+  .dots { display: flex; gap: 10px; margin-top: 4px; }
+  .dots i { width: 36px; height: 36px; border-radius: 50%; }
+
+  /* 마무리 장 */
+  .cta-icon { position: absolute; left: 50%; top: 250px; width: 300px; height: 300px; margin-left: -150px; border-radius: 70px; background: #fff; display: grid; place-items: center; box-shadow: 0 40px 70px -30px rgba(0,0,0,.45); }
+  .cta-icon img { width: 230px; height: 230px; }
+  .center { position: absolute; left: 80px; right: 80px; text-align: center; }
+  .pill { display: inline-block; margin: 0 8px 14px; padding: 14px 28px; border-radius: 999px; background: rgba(255,255,255,.18); font-size: 32px; font-weight: 700; }
+  .big-url { display: inline-block; margin-top: 30px; padding: 26px 46px; border-radius: 26px; background: #fff; color: #0F7F70; font-size: 56px; font-weight: 900; letter-spacing: -.03em; box-shadow: 0 24px 40px -20px rgba(0,0,0,.4); }
+
+  /* 가로형(트위터·링크 미리보기) */
+  .wide h1 { font-size: 88px; }
+  .wide .sub { font-size: 32px; margin-top: 22px; }
+  .wide .copy { top: 170px; left: 72px; right: auto; width: 560px; }
+  .wide .brand { top: 56px; left: 72px; font-size: 30px; }
+  .wide .brand img { width: 42px; height: 42px; }
+  .wide .url { left: 72px; bottom: 56px; font-size: 26px; }
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<script>
+// 가방 창 한 개를 만든다. items: [이름, 그림문자, 색] 또는 null(빈칸)
+function bagHtml(theme, tabs, active, items, cols, width) {
+  const tabHtml = tabs.map((t, i) => `<span class="${i === active ? 'on' : ''}">${t}</span>`).join('') + '<span class="add">+ 새 가방</span>';
+  const slots = items.map(it => it ? `<div class="slot"><div class="ico" style="background:${it[2]}">${it[1]}</div>${it[0]}</div>` : '<div class="slot"></div>').join('');
+  return `<div class="bag ${theme}" style="width:${width}px;--k:${width / 430}"><div class="bag-head"><div class="pin">📌</div>${tabHtml}</div>
+          <div class="slots" style="grid-template-columns:repeat(${cols},1fr)">${slots}</div></div>`;
+}
+const GAME = [['게임','🎮','#F76B15'], null, ['음악','🎵','#E5484D'], null, ['채팅','💬','#30A46C'], null, ['녹화','🎥','#8E4EC6'], null, ['캡처','📸','#0090FF']];
+const WORK = [['메모','📝','#F5C451'], ['브라우저','🌐','#5BA8F5'], null, ['터미널','⌨️','#3B3F45'], ['폴더','📁','#F2A541'], null, null, ['메일','✉️','#7C8CF8'], null];
+const STUDY = [['사전','📖','#AD7F58'], ['필기','✏️','#FFC53D'], ['계산기','🧮','#8B8D98'], null, null, ['타이머','⏱️','#12A594'], null, null, null];
+const TABS = ['작업', '게임', '공부'];
+
+function taskbar(extra = '') {
+  return `<div class="taskbar"><div class="tb start"><i></i><i></i><i></i><i></i></div><div class="tb">🔍</div><div class="tb plain"></div>
+          <div class="tb drawer ${extra}"><img src="../site/icon.png"></div><div class="tb plain"></div></div>`;
+}
+const brand = (page) => `<div class="brand"><img src="../site/icon.png">TaskPack</div>${page ? `<div class="page">${page}</div>` : ''}`;
+const url = '<div class="url">taskpack.vercel.app</div>';
+
+const cards = {
+  'ig-1': () => `<div class="card">${brand('1 / 5')}
+      <div class="copy"><h1>작업표시줄에<br><span class="mark">가방</span> 하나.</h1>
+      <p class="sub">누르면 펼쳐지는 Windows 작업표시줄 가방</p></div>
+      <div class="desk" style="left:80px;right:80px;top:640px;height:620px">
+        <div style="position:absolute;left:50%;bottom:112px;margin-left:-190px">${bagHtml('blue', TABS, 1, GAME, 3, 430)}</div>${taskbar('ring')}</div>
+      <div class="sticker" style="right:70px;top:590px">아버지가방에<br>들어가신다</div></div>`,
+
+  'ig-2': () => {
+    const pool = ['📝','🌐','🎮','🎵','📁','💬','🎥','📸','⌨️','✉️','📖','🧮','⏱️','🗂️','🎨','📊','🖼️','🧾'];
+    const colors = ['#F5C451','#5BA8F5','#F76B15','#E5484D','#F2A541','#30A46C','#8E4EC6','#0090FF','#3B3F45','#7C8CF8','#AD7F58','#8B8D98','#12A594','#D6409F'];
+    let icons = '', seed = 7;
+    const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+    for (let i = 0; i < 26; i++)
+      icons += `<div class="ico" style="left:${40 + rnd() * 800}px;top:${30 + rnd() * 380}px;background:${colors[i % colors.length]};transform:rotate(${(rnd() - .5) * 24}deg)">${pool[i % pool.length]}</div>`;
+    let crowded = '';
+    for (let i = 0; i < 11; i++) crowded += `<div class="tb" style="width:62px;height:62px;font-size:30px">${pool[(i * 5) % pool.length]}</div>`;
+    return `<div class="card dark">${brand('2 / 5')}
+      <div class="copy"><h2>바탕화면은 아이콘 밭,<br>작업표시줄은 <span class="mark">만원</span>.</h2>
+      <p class="sub">자주 쓰는 프로그램, 어디에 두고 계세요?</p></div>
+      <div class="desk" style="left:80px;right:80px;top:640px;height:620px"><div class="mess">${icons}</div>
+        <div class="taskbar" style="gap:4px">${crowded}</div></div></div>`;
+  },
+
+  'ig-3': () => `<div class="card">${brand('3 / 5')}
+      <div class="copy"><h2>가방 <span class="mark">하나</span>에<br>다 넣으세요.</h2></div>
+      <div class="desk" style="left:80px;right:80px;top:420px;height:520px">
+        <div style="position:absolute;left:50%;bottom:112px;margin-left:-140px">${bagHtml('dark', TABS, 0, WORK, 3, 320)}</div>
+        <div class="taskbar"><div class="tb start"><i></i><i></i><i></i><i></i></div><div class="tb">🔍</div><div class="tb drawer ring"><img src="../site/icon.png"></div></div></div>
+      <div class="steps">
+        <div class="step"><b>1</b><br>가방 아이콘을 누르면<br>가방이 펼쳐지고<small>작업표시줄 바로 옆에</small></div>
+        <div class="step"><b>2</b><br>칸을 한 번 누르면<br>실행하고 닫혀요<small>다시 누르거나 바깥을 눌러도 닫힘</small></div>
+      </div>${url}</div>`,
+
+  'ig-4': () => `<div class="card">${brand('4 / 5')}
+      <div class="copy"><h2>가방마다<br><span class="mark">내 마음대로</span>.</h2></div>
+      <div class="feats">
+        <div class="feat"><div class="fi">🗂️</div><h3>탭으로 여러 가방</h3><p>작업용, 게임용, 공부용. 이름과 순서도 자유롭게</p></div>
+        <div class="feat"><div class="fi">🖱️</div><h3>끌어서 넣기</h3><p>파일·폴더·앱을 원하는 칸에. 작업표시줄 앱은 체크만</p></div>
+        <div class="feat"><div class="fi">🎨</div><h3>가방마다 다른 색</h3><p>라이트·다크·커스텀</p>
+          <div class="dots"><i style="background:#E5484D"></i><i style="background:#F76B15"></i><i style="background:#FFC53D"></i><i style="background:#30A46C"></i><i style="background:#3E63DD"></i><i style="background:#8E4EC6"></i></div></div>
+        <div class="feat"><div class="fi">💾</div><h3>zip 하나로 백업</h3><p>새 PC에서도 가방 그대로</p></div>
+      </div>${url}</div>`,
+
+  'ig-5': () => `<div class="card teal">${brand('5 / 5')}
+      <div class="cta-icon"><img src="../site/icon.png"></div>
+      <div class="center" style="top:640px"><h2>무료로 써 보세요.</h2>
+        <div style="margin-top:34px"><span class="pill">Windows 10 · 11</span><span class="pill">오픈소스 MIT</span><span class="pill">한국어</span></div>
+        <div class="big-url">taskpack.vercel.app</div>
+        <p class="sub" style="margin-top:34px">GitHub · pomeloEater/TaskPack</p></div></div>`,
+
+  // 트위터(X) 1200×675
+  'x': () => `<div class="card wide">${brand()}
+      <div class="copy"><h1>작업표시줄에<br><span class="mark">가방</span> 하나.</h1>
+      <p class="sub">누르면 펼쳐지는 작업표시줄 가방.<br>무료 · 오픈소스 · Windows 10/11</p></div>
+      <div class="desk" style="left:680px;right:56px;top:56px;bottom:56px">
+        <div style="position:absolute;left:50%;bottom:108px;margin-left:-128px">${bagHtml('blue', TABS, 1, GAME, 3, 290)}</div>${taskbar('ring')}</div>
+      <div class="sticker" style="left:640px;top:34px;font-size:26px;transform:rotate(-6deg)">아버지가방에<br>들어가신다</div>${url}</div>`,
+
+  // 링크 미리보기(오픈 그래프) 1200×630
+  'og': () => `<div class="card wide">${brand()}
+      <div class="copy"><h1>작업표시줄에<br><span class="mark">가방</span> 하나.</h1>
+      <p class="sub">누르면 펼쳐지는 Windows 작업표시줄 가방</p></div>
+      <div class="desk" style="left:680px;right:56px;top:48px;bottom:48px">
+        <div style="position:absolute;left:50%;bottom:108px;margin-left:-128px">${bagHtml('blue', TABS, 1, GAME, 3, 280)}</div>${taskbar('ring')}</div>${url}</div>`,
+};
+
+const key = location.hash.slice(1) || 'ig-1';
+document.getElementById('stage').innerHTML = (cards[key] || cards['ig-1'])();
+</script>
+</body>
+</html>
