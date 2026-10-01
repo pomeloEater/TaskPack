@@ -240,7 +240,7 @@ h2 { margin: 0; font-size: clamp(28px, 3.6vw, 42px); font-weight: 850; letter-sp
 .steps h3 { margin: 0 0 6px; font-size: 18px; font-weight: 750; }
 .steps p { margin: 0; color: var(--muted); font-size: 15px; }
 .steps a { color: var(--teal); font-weight: 600; text-underline-offset: 3px; }
-/* .NET 8 런타임 안내 카드 */
+/* .NET 10 런타임 안내 카드 */
 .runtime {
   margin: 18px 0 0; padding: 22px 24px; border-radius: var(--radius);
   background: var(--card); border: 1px solid var(--line); box-shadow: var(--shadow);

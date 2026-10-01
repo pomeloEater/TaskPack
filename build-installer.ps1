@@ -1,7 +1,7 @@
 ﻿# 배포용 설치 파일 두 종류를 만든다 (installer\Output 아래).
 #   TaskPack-Setup-<버전>.exe       .NET 포함판 (기본)
-#   TaskPack-Setup-<버전>-lite.exe  lite (.NET 8 데스크톱 런타임을 따로 설치해야 함)
-# 필요한 것: .NET 8 SDK, Inno Setup 6 (winget install JRSoftware.InnoSetup)
+#   TaskPack-Setup-<버전>-lite.exe  lite (.NET 10 데스크톱 런타임을 따로 설치해야 함)
+# 필요한 것: .NET 10 SDK, Inno Setup 6 (winget install JRSoftware.InnoSetup)
 # 버전은 TaskPack.csproj 의 <Version> 을 따른다.
 $ErrorActionPreference = 'Stop'
 $root = $PSScriptRoot

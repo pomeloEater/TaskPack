@@ -13,7 +13,7 @@
   <a href="https://github.com/pomeloEater/TaskPack/releases/latest"><img src="https://img.shields.io/github/v/release/pomeloEater/TaskPack?label=%EC%B5%9C%EC%8B%A0%20%EB%B2%84%EC%A0%84&color=0F9A87" alt="최신 버전"></a>
   <a href="https://github.com/pomeloEater/TaskPack/releases"><img src="https://img.shields.io/github/downloads/pomeloEater/TaskPack/total?label=%EB%82%B4%EB%A0%A4%EB%B0%9B%EA%B8%B0&color=B5541A" alt="내려받기 수"></a>
   <img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4" alt="Windows 10 | 11">
-  <img src="https://img.shields.io/badge/.NET-8-512BD4" alt=".NET 8">
+  <img src="https://img.shields.io/badge/.NET-10-512BD4" alt=".NET 10">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-1C1A17" alt="MIT License"></a>
 </p>
 
@@ -45,12 +45,12 @@
 | 파일 | 크기 | 이럴 때 |
 |---|---|---|
 | `TaskPack-Setup-<버전>.exe` (기본) | 약 51MB | **처음이라면 이쪽.** .NET이 들어 있어 따로 설치할 것이 없습니다. ARM PC도 이쪽을 쓰세요 (x64 에뮬레이션으로 실행). |
-| `TaskPack-Setup-<버전>-lite.exe` | 약 5MB | PC에 **.NET 8 데스크톱 런타임(x64)**이 이미 있을 때. 없으면 설치 프로그램이 알려 줍니다. |
+| `TaskPack-Setup-<버전>-lite.exe` | 약 5MB | PC에 **.NET 10 데스크톱 런타임(x64)**이 이미 있을 때. 없으면 설치 프로그램이 알려 줍니다. |
 
 - 두 파일은 같은 프로그램입니다. 어느 쪽을 깔아도 서로 덮어 설치되고(업그레이드로 취급), 가방 데이터는 그대로 남습니다.
-- lite에서 .NET 8 데스크톱 런타임이 없다고 나오면:
-  - 바로 받기: [Microsoft 공식 설치 파일 (Windows x64, 약 56MB)](https://aka.ms/dotnet/8.0/windowsdesktop-runtime-win-x64.exe) — 항상 8.0 최신판으로 연결됩니다.
-  - 또는 [다운로드 페이지](https://dotnet.microsoft.com/download/dotnet/8.0)에서 **.NET 데스크톱 런타임 8.0.x**(.NET Desktop Runtime) 항목의 Windows **설치 관리자 x64**를 받으세요. SDK, ASP.NET Core 런타임, 그냥 .NET 런타임이 아닙니다.
+- lite에서 .NET 10 데스크톱 런타임이 없다고 나오면:
+  - 바로 받기: [Microsoft 공식 설치 파일 (Windows x64, 약 60MB)](https://aka.ms/dotnet/10.0/windowsdesktop-runtime-win-x64.exe) — 항상 10.0 최신판으로 연결됩니다.
+  - 또는 [다운로드 페이지](https://dotnet.microsoft.com/download/dotnet/10.0)에서 **.NET 데스크톱 런타임 10.0.x**(.NET Desktop Runtime) 항목의 Windows **설치 관리자 x64**를 받으세요. SDK, ASP.NET Core 런타임, 그냥 .NET 런타임이 아닙니다.
 - 기본은 관리자 권한 없이 내 계정에만 설치합니다(`%LOCALAPPDATA%\Programs\TaskPack`). 시작할 때 "모든 사용자용"을 고를 수도 있습니다.
 - 선택 항목: 설치 경로, 바탕화면 아이콘, 설치 후 실행
 - 제거는 Windows 설정 → 앱에서 합니다. 제거할 때 가방 데이터도 지울지 묻습니다(기본: 보관).
@@ -114,7 +114,7 @@ Windows가 프로그램의 자동 고정을 막고 있어서 한 번은 직접 �
 
 ## 6. 개발자용: 빌드와 설치 파일 만들기
 
-필요한 것: .NET 8 SDK, 설치 파일을 만들 때는 Inno Setup 6 (`winget install JRSoftware.InnoSetup`)
+필요한 것: .NET 10 SDK, 설치 파일을 만들 때는 Inno Setup 6 (`winget install JRSoftware.InnoSetup`)
 
 | 하고 싶은 일 | 명령 |
 |---|---|
@@ -145,5 +145,5 @@ powershell -STA -ExecutionPolicy Bypass -File .\tools\make-icon.ps1 -Preview
 
 - Windows가 프로그램의 자동 고정을 막기 때문에 작업표시줄 고정은 직접 해야 합니다.
 - Windows 11 기본 작업표시줄은 아래쪽만 지원합니다. 세로 작업표시줄(StartAllBack 등)이면 가방이 옆으로 펼쳐집니다.
-- lite 버전은 .NET 8 데스크톱 런타임(x64)이 있어야 합니다. ARM PC는 기본 설치 파일을 쓰세요.
+- lite 버전은 .NET 10 데스크톱 런타임(x64)이 있어야 합니다. ARM PC는 기본 설치 파일을 쓰세요.
 - 관리자 권한이 필요한 프로그램은 실행할 때 권한 확인 창이 뜹니다.

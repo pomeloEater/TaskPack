@@ -94,7 +94,7 @@
   setTimeout(() => drawer.classList.add('nudge'), 2600);
 
   // ───────── 최신 릴리스 다운로드 연결 ─────────
-  // 설치 파일은 두 가지: TaskPack-Setup-<버전>.exe (.NET 포함, 기본)과 TaskPack-Setup-<버전>-lite.exe (.NET 8을 따로 설치).
+  // 설치 파일은 두 가지: TaskPack-Setup-<버전>.exe (.NET 포함, 기본)과 TaskPack-Setup-<버전>-lite.exe (.NET 10을 따로 설치).
   // 파일 이름의 "-lite"로 둘을 가른다. 실패하거나 못 찾으면 링크는 GitHub 릴리스 페이지를 그대로 가리킨다
   const mb = (bytes) => (bytes / 1024 / 1024).toFixed(1);
   fetch(`https://api.github.com/repos/${REPO}/releases/latest`)

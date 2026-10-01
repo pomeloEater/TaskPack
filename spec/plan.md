@@ -4,7 +4,7 @@
 
 - 영어 이름: TaskPack (실행 파일 `TaskPack.exe`)
 - 위치: `D:\Development2026\private\taskpack`
-- 기술: C# / .NET 8 / WPF (설치된 SDK 8.0.423), 외부 패키지 없음
+- 기술: C# / .NET 10 / WPF (1.1.1부터. 1.1.0까지는 .NET 8), 외부 패키지 없음
 
 ## 목표 (사용자 요구)
 

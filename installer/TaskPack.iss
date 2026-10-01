@@ -95,8 +95,8 @@ english.FinishedLabel=TaskPack has been installed.%n%nTo pin it to the taskbar, 
 english.FinishedLabelNoIcons=TaskPack has been installed.%n%nTo pin it to the taskbar, right-click TaskPack in the Start menu and choose 'Pin to taskbar'. (Windows does not allow programs to pin themselves.)
 
 [CustomMessages]
-korean.NeedDotNet=TaskPack을 실행하려면 Microsoft의 무료 구성 요소인 .NET 8 데스크톱 런타임(x64)이 필요합니다.%n%n[예]를 누르면 설치를 멈추고 Microsoft 공식 사이트에서 런타임 설치 파일(약 56MB)을 바로 내려받습니다.%n받은 파일을 실행해 런타임을 설치한 뒤, 이 TaskPack 설치 프로그램을 다시 실행해 주세요.%n%n(직접 받으려면 dotnet.microsoft.com 다운로드 페이지에서 ".NET 데스크톱 런타임 8.0.x"의 Windows "설치 관리자 x64"를 받으세요.)
-english.NeedDotNet=TaskPack requires the .NET 8 Desktop Runtime (x64), a free component from Microsoft.%n%nChoose [Yes] to stop setup and download the runtime installer (about 56 MB) from Microsoft.%nRun it, then run this TaskPack setup again.%n%n(To get it yourself: on the dotnet.microsoft.com download page, pick ".NET Desktop Runtime 8.0.x" > Windows "Installer x64".)
+korean.NeedDotNet=TaskPack을 실행하려면 Microsoft의 무료 구성 요소인 .NET 10 데스크톱 런타임(x64)이 필요합니다.%n%n[예]를 누르면 설치를 멈추고 Microsoft 공식 사이트에서 런타임 설치 파일(약 60MB)을 바로 내려받습니다.%n받은 파일을 실행해 런타임을 설치한 뒤, 이 TaskPack 설치 프로그램을 다시 실행해 주세요.%n%n(직접 받으려면 dotnet.microsoft.com 다운로드 페이지에서 ".NET 데스크톱 런타임 10.0.x"의 Windows "설치 관리자 x64"를 받으세요.)
+english.NeedDotNet=TaskPack requires the .NET 10 Desktop Runtime (x64), a free component from Microsoft.%n%nChoose [Yes] to stop setup and download the runtime installer (about 60 MB) from Microsoft.%nRun it, then run this TaskPack setup again.%n%n(To get it yourself: on the dotnet.microsoft.com download page, pick ".NET Desktop Runtime 10.0.x" > Windows "Installer x64".)
 korean.DeleteData=가방 데이터(가방 목록, 칸 내용, 아이콘, 백업 전 보관본)도 지울까요?%n%n다시 설치해서 쓸 생각이면 '아니요'를 누르세요.
 english.DeleteData=Also delete your bags (tabs, items, icons, pre-restore copies)?%n%nChoose 'No' if you plan to reinstall.
 
@@ -108,23 +108,23 @@ begin
 end;
 
 #ifdef Lite
-// .NET 8 데스크톱 런타임(x64)이 설치되어 있는지: dotnet\shared\Microsoft.WindowsDesktop.App\8.* 폴더로 판단
-function HasDesktopRuntime8(const DotNetDir: String): Boolean;
+// .NET 10 데스크톱 런타임(x64)이 설치되어 있는지: dotnet\shared\Microsoft.WindowsDesktop.App.* 폴더로 판단
+function HasDesktopRuntime10(const DotNetDir: String): Boolean;
 var
   FindRec: TFindRec;
 begin
-  Result := FindFirst(DotNetDir + '\shared\Microsoft.WindowsDesktop.App\8.*', FindRec);
+  Result := FindFirst(DotNetDir + '\shared\Microsoft.WindowsDesktop.App.*', FindRec);
   if Result then
     FindClose(FindRec);
 end;
 
-function IsDesktopRuntime8Installed: Boolean;
+function IsDesktopRuntime10Installed: Boolean;
 var
   Dir: String;
 begin
   Dir := ExpandConstant('{commonpf64}\dotnet');
   // ARM64 Windows는 x64 런타임을 dotnet\x64 아래에 설치한다
-  Result := HasDesktopRuntime8(Dir) or HasDesktopRuntime8(Dir + '\x64');
+  Result := HasDesktopRuntime10(Dir) or HasDesktopRuntime10(Dir + '\x64');
 end;
 
 function InitializeSetup: Boolean;
@@ -132,11 +132,11 @@ var
   ErrorCode: Integer;
 begin
   Result := True;
-  if not IsDesktopRuntime8Installed then
+  if not IsDesktopRuntime10Installed then
   begin
     if SuppressibleMsgBox(CustomMessage('NeedDotNet'), mbConfirmation, MB_YESNO, IDYES) = IDYES then
-      // Microsoft 공식 단축 주소: 항상 .NET 8 데스크톱 런타임 x64 최신 설치 파일로 연결된다
-      ShellExec('open', 'https://aka.ms/dotnet/8.0/windowsdesktop-runtime-win-x64.exe', '', '', SW_SHOWNORMAL, ewNoWait, ErrorCode);
+      // Microsoft 공식 단축 주소: 항상 .NET 10 데스크톱 런타임 x64 최신 설치 파일로 연결된다
+      ShellExec('open', 'https://aka.ms/dotnet/10.0/windowsdesktop-runtime-win-x64.exe', '', '', SW_SHOWNORMAL, ewNoWait, ErrorCode);
     Result := False;
   end;
 end;
