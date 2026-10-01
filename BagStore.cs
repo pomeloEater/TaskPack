@@ -61,8 +61,10 @@ public static class BagStore
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping, // 한글을 그대로 읽을 수 있게 저장
     };
 
-    public static string Root { get; } = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "TaskPack");
+    // 개발·시험용: TASKPACK_DATA_DIR 환경변수가 있으면 실제 데이터 대신 그 폴더를 쓴다
+    public static string Root { get; } = Environment.GetEnvironmentVariable("TASKPACK_DATA_DIR") is { Length: > 0 } dir
+        ? Path.GetFullPath(dir)
+        : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "TaskPack");
 
     public static string BagsDir { get; } = Path.Combine(Root, "bags");
     private static string ConfigFile => Path.Combine(Root, "config.json");
