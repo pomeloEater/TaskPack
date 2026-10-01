@@ -1,4 +1,6 @@
-﻿# 배포용 설치 파일(installer\Output\TaskPack-Setup-<버전>.exe)을 만든다.
+﻿# 배포용 설치 파일 두 종류를 만든다 (installer\Output 아래).
+#   TaskPack-Setup-<버전>.exe       .NET 포함판 (기본)
+#   TaskPack-Setup-<버전>-lite.exe  가벼운 판 (.NET 8 데스크톱 런타임을 따로 설치해야 함)
 # 필요한 것: .NET 8 SDK, Inno Setup 6 (winget install JRSoftware.InnoSetup)
 # 버전은 TaskPack.csproj 의 <Version> 을 따른다.
 $ErrorActionPreference = 'Stop'
@@ -10,12 +12,19 @@ $installer = Join-Path $root 'installer'
 $version = @($proj.Project.PropertyGroup | ForEach-Object { $_.Version } | Where-Object { $_ })[0]
 if (-not $version) { throw 'TaskPack.csproj 에 <Version> 이 없습니다.' }
 
-# 2. 배포용 빌드 (.NET 런타임 미포함)
+# 2. 배포용 빌드 두 가지: .NET 포함판(publish), 가벼운 판(publish-lite)
 $publish = Join-Path $installer 'publish'
-if (Test-Path $publish) { Remove-Item $publish -Recurse -Force }
-dotnet publish (Join-Path $root 'TaskPack.csproj') -c Release -o $publish
+$publishLite = Join-Path $installer 'publish-lite'
+foreach ($dir in $publish, $publishLite) {
+    if (Test-Path $dir) { Remove-Item $dir -Recurse -Force }
+}
+dotnet publish (Join-Path $root 'TaskPack.csproj') -c Release -p:SelfContained=true -o $publish
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-Get-ChildItem $publish -Filter *.pdb | Remove-Item
+dotnet publish (Join-Path $root 'TaskPack.csproj') -c Release -o $publishLite
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+foreach ($dir in $publish, $publishLite) {
+    Get-ChildItem $dir -Filter *.pdb | Remove-Item
+}
 
 # 3. 설치 화면 오른쪽 위 그림 (앱 아이콘 미리보기 → 흰 바탕 bmp)
 Add-Type -AssemblyName System.Drawing
@@ -38,6 +47,11 @@ if (-not $iscc) { throw 'Inno Setup 6 을 찾을 수 없습니다. winget instal
 
 & $iscc "/DAppVersion=$version" (Join-Path $installer 'TaskPack.iss')
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+& $iscc "/DAppVersion=$version" '/DLite=1' (Join-Path $installer 'TaskPack.iss')
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 Write-Host ''
-Write-Host "만듦: $(Join-Path $installer "Output\TaskPack-Setup-$version.exe")"
+foreach ($name in "TaskPack-Setup-$version.exe", "TaskPack-Setup-$version-lite.exe") {
+    $file = Get-Item (Join-Path $installer "Output\$name")
+    Write-Host ("만듦: {0}  ({1:N1} MB)" -f $file.FullName, ($file.Length / 1MB))
+}

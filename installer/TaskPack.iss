@@ -4,11 +4,18 @@
 #ifndef AppVersion
   #define AppVersion "0.0.0"
 #endif
+; 두 가지 설치 파일: 기본은 .NET 포함판, /DLite=1 이면 .NET을 따로 설치해야 하는 가벼운 판 (build-installer.ps1 이 둘 다 만든다)
+#ifdef Lite
+  #define OutputSuffix "-lite"
+  #define PublishDir "publish-lite"
+#else
+  #define OutputSuffix ""
+  #define PublishDir "publish"
+#endif
 #define AppName "TaskPack"
 #define AppExe "TaskPack.exe"
 ; 작업표시줄에서 TaskPack 아이콘 아래에 "실행 중"으로 묶이려면 바로가기와 프로그램이 같은 식별자를 써야 한다 (Drawer.AppId)
 #define AppUserModelId "TaskPack.Drawer"
-#define PublishDir "publish"
 
 [Setup]
 AppId={{6B0E4C9A-2F3D-4E7B-9C1A-5D8F7E2B4A61}
@@ -31,7 +38,7 @@ UninstallDisplayName={#AppName}
 ; 실행 중인 TaskPack이 있으면 닫고 설치·제거한다
 CloseApplications=yes
 OutputDir=Output
-OutputBaseFilename=TaskPack-Setup-{#AppVersion}
+OutputBaseFilename=TaskPack-Setup-{#AppVersion}{#OutputSuffix}
 Compression=lzma2
 SolidCompression=yes
 ShowLanguageDialog=auto
@@ -42,6 +49,26 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
+
+[InstallDelete]
+; 판이 다른 설치 파일 위에 덮어 설치해도 실행 방식이 섞이지 않게, 이전 프로그램 파일을 먼저 지운다.
+; (.NET 포함판의 런타임 DLL이 가벼운 판 설치 폴더에 남는 것을 막는다. 가방 데이터는 %APPDATA%에 있어 영향 없음)
+; TaskPack.exe가 있는 폴더일 때만 지우며, 제거 프로그램(unins*)은 건드리지 않는다
+Type: files; Name: "{app}\*.dll"; Check: IsExistingInstall
+Type: files; Name: "{app}\*.json"; Check: IsExistingInstall
+Type: filesandordirs; Name: "{app}\cs"; Check: IsExistingInstall
+Type: filesandordirs; Name: "{app}\de"; Check: IsExistingInstall
+Type: filesandordirs; Name: "{app}\es"; Check: IsExistingInstall
+Type: filesandordirs; Name: "{app}\fr"; Check: IsExistingInstall
+Type: filesandordirs; Name: "{app}\it"; Check: IsExistingInstall
+Type: filesandordirs; Name: "{app}\ja"; Check: IsExistingInstall
+Type: filesandordirs; Name: "{app}\ko"; Check: IsExistingInstall
+Type: filesandordirs; Name: "{app}\pl"; Check: IsExistingInstall
+Type: filesandordirs; Name: "{app}\pt-BR"; Check: IsExistingInstall
+Type: filesandordirs; Name: "{app}\ru"; Check: IsExistingInstall
+Type: filesandordirs; Name: "{app}\tr"; Check: IsExistingInstall
+Type: filesandordirs; Name: "{app}\zh-Hans"; Check: IsExistingInstall
+Type: filesandordirs; Name: "{app}\zh-Hant"; Check: IsExistingInstall
 
 [Files]
 Source: "{#PublishDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
@@ -73,14 +100,30 @@ korean.DeleteData=가방 데이터(가방 목록, 칸 내용, 아이콘, 백업 
 english.DeleteData=Also delete your bags (tabs, items, icons, pre-restore copies)?%n%nChoose 'No' if you plan to reinstall.
 
 [Code]
-// .NET 8 데스크톱 런타임이 설치되어 있는지: dotnet\shared\Microsoft.WindowsDesktop.App\8.* 폴더로 판단
-function IsDesktopRuntime8Installed: Boolean;
+// 같은 폴더에 이미 TaskPack이 설치되어 있는지 (덮어 설치 정리 대상)
+function IsExistingInstall: Boolean;
+begin
+  Result := FileExists(ExpandConstant('{app}\{#AppExe}'));
+end;
+
+#ifdef Lite
+// .NET 8 데스크톱 런타임(x64)이 설치되어 있는지: dotnet\shared\Microsoft.WindowsDesktop.App\8.* 폴더로 판단
+function HasDesktopRuntime8(const DotNetDir: String): Boolean;
 var
   FindRec: TFindRec;
 begin
-  Result := FindFirst(ExpandConstant('{commonpf64}\dotnet\shared\Microsoft.WindowsDesktop.App\8.*'), FindRec);
+  Result := FindFirst(DotNetDir + '\shared\Microsoft.WindowsDesktop.App\8.*', FindRec);
   if Result then
     FindClose(FindRec);
+end;
+
+function IsDesktopRuntime8Installed: Boolean;
+var
+  Dir: String;
+begin
+  Dir := ExpandConstant('{commonpf64}\dotnet');
+  // ARM64 Windows는 x64 런타임을 dotnet\x64 아래에 설치한다
+  Result := HasDesktopRuntime8(Dir) or HasDesktopRuntime8(Dir + '\x64');
 end;
 
 function InitializeSetup: Boolean;
@@ -96,6 +139,7 @@ begin
     Result := False;
   end;
 end;
+#endif
 
 // 제거가 끝나면 가방 데이터도 지울지 묻는다 (기본: 아니요)
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
