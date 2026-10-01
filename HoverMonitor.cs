@@ -12,19 +12,21 @@ internal sealed class HoverMonitor : IDisposable
     private static readonly string ButtonId = "Appid: " + Drawer.AppId;
 
     private const int PollMs = 50;
-    private const int DwellMs = 400;        // 이만큼 머물러야 열린다 (Windows 기본 "마우스 머무름" 시간)
     private const int MoveTolerance = 6;    // 이 거리(픽셀) 안의 움직임은 머무는 것으로 본다
     private const int ConfirmDelayMs = 60;  // 아이콘이 움직이는 중의 오판을 막으려고 두 번 읽는 간격
 
     private readonly Func<bool> _canOpen;
+    private readonly Func<int> _dwellMs;
     private readonly Action<RECT> _onHover;
     private readonly CancellationTokenSource _stop = new();
     private readonly Thread _thread;
 
-    // canOpen: 지금 가방을 열 수 있는 상태인지 (이미 열려 있으면 false). onHover: 아이콘 영역(물리 픽셀)과 함께 부른다 (다른 스레드에서)
-    public HoverMonitor(Func<bool> canOpen, Action<RECT> onHover)
+    // canOpen: 지금 가방을 열 수 있는 상태인지 (이미 열려 있으면 false). dwellMs: 아이콘 위에 이만큼(밀리초) 머물러야 열린다.
+    // onHover: 아이콘 영역(물리 픽셀)과 함께 부른다 (다른 스레드에서)
+    public HoverMonitor(Func<bool> canOpen, Func<int> dwellMs, Action<RECT> onHover)
     {
         _canOpen = canOpen;
+        _dwellMs = dwellMs;
         _onHover = onHover;
         _thread = new Thread(Run) { IsBackground = true, Name = "TaskPack.HoverMonitor" };
         _thread.SetApartmentState(ApartmentState.MTA);
@@ -59,7 +61,7 @@ internal sealed class HoverMonitor : IDisposable
                     since.Restart();
                     continue;
                 }
-                if (handled || since.ElapsedMilliseconds < DwellMs)
+                if (handled || since.ElapsedMilliseconds < _dwellMs())
                     continue;
                 handled = true; // 같은 자리에서는 한 번만 확인한다 (움직이면 다시 확인)
                 if (_canOpen() && ConfirmedButtonRect(p) is { } rect)

@@ -13,6 +13,7 @@ public partial class App : Application
     private bool _resident;
     private volatile bool _bagOpen;                 // 가방이 열려 있는지 (마우스 감시 스레드가 읽는다)
     private HoverMonitor? _hover;
+    private volatile int _hoverDelayMs = HoverDelay.Default; // 마우스오버 머무는 시간. 설정을 읽을 때마다 갱신한다
     private TrayIcon? _tray;
     private volatile bool _settingsOpen;            // 알림 영역에서 연 설정 창이 떠 있는 동안은 마우스를 올려도 가방을 열지 않는다
 
@@ -65,6 +66,7 @@ public partial class App : Application
             return;
         }
 
+        _hoverDelayMs = HoverDelay.Normalize(config.HoverDelayMs);
         var plan = StartupPlan.Decide(background, false, false, config.HoverOpen);
         switch (plan.Action)
         {
@@ -113,7 +115,7 @@ public partial class App : Application
         _openWait = ThreadPool.RegisterWaitForSingleObject(_openSignal,
             (_, _) => Dispatcher.InvokeAsync(OpenBagFromSignal), null, Timeout.Infinite, executeOnlyOnce: false);
         // 작업표시줄 아이콘 위에 마우스가 머물면 가방을 연다
-        _hover = new HoverMonitor(() => !_bagOpen && !_settingsOpen, button => Dispatcher.InvokeAsync(() => OpenBagFromHover(button)));
+        _hover = new HoverMonitor(() => !_bagOpen && !_settingsOpen, () => _hoverDelayMs, button => Dispatcher.InvokeAsync(() => OpenBagFromHover(button)));
         // 켜져 있다는 사실과 끄는 길을 알림 영역(시계 옆)에 보인다
         _tray = new TrayIcon(OpenBagFromSignal, OpenSettingsFromTray, TurnOffHoverFromTray, Shutdown);
         Autostart.RefreshPath();
@@ -144,6 +146,7 @@ public partial class App : Application
         try
         {
             var (config, bags) = LoadAll();
+            _hoverDelayMs = HoverDelay.Normalize(config.HoverDelayMs);
             if (config.HoverOpen)
                 ShowBag(config, bags, button);
         }
@@ -184,12 +187,14 @@ public partial class App : Application
         TrimMemory();
     }
 
-    // 설정을 읽지 못하면 null
-    private static bool? ReadHoverOpen()
+    // 마우스오버가 켜져 있는지 읽는다(설정을 읽지 못하면 null). 머무는 시간도 이때 함께 갱신한다
+    private bool? ReadHoverOpen()
     {
         try
         {
-            return BagStore.LoadConfig().HoverOpen;
+            var config = BagStore.LoadConfig();
+            _hoverDelayMs = HoverDelay.Normalize(config.HoverDelayMs);
+            return config.HoverOpen;
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or JsonException)
         {

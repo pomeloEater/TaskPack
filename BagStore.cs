@@ -40,6 +40,20 @@ public sealed class Bag
     }
 }
 
+// 마우스를 올린 뒤 가방이 열리기까지 머무는 시간의 선택지
+public static class HoverDelay
+{
+    public const int Default = 400; // Windows 기본 "마우스 머무름" 시간
+
+    public static readonly (string Label, int Ms)[] Options =
+    {
+        ("0.2초", 200), ("0.4초 (기본)", 400), ("0.7초", 700), ("1초", 1000),
+    };
+
+    // 선택지에 없는 값(파일을 직접 고친 경우 등)은 기본값으로 돌린다
+    public static int Normalize(int ms) => Array.Exists(Options, o => o.Ms == ms) ? ms : Default;
+}
+
 public sealed class DrawerConfig
 {
     public List<string> Tabs { get; set; } = new();  // 탭 순서 = 가방 id 목록
@@ -53,6 +67,7 @@ public sealed class DrawerConfig
     public string? LatestUrl { get; set; }           // 그 버전의 같은 판 설치 파일 주소 (없으면 릴리스 페이지)
     public string? SkippedVersion { get; set; }      // ×로 건너뛴 버전. 다음 버전이 나오면 다시 알린다
     public bool HoverIntroDismissed { get; set; }    // 가방 아래 "마우스를 올리면 열려요" 소개를 다시 보지 않기
+    public int HoverDelayMs { get; set; } = HoverDelay.Default; // 아이콘 위에 이만큼 머물면 가방이 열린다
     public bool HoverOpen { get; set; }              // 작업표시줄 아이콘에 마우스를 올리면 가방 열기. 켜면 TaskPack이 뒤에서 계속 켜져 있다
 }
 

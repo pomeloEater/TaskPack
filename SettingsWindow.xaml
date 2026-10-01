@@ -163,13 +163,17 @@
                             <TextBlock Text="마우스를 올리면 열기" Style="{StaticResource FieldLabel}"/>
                             <CheckBox x:Name="HoverSwitch" Style="{StaticResource Switch}"
                                       Content="작업표시줄 아이콘에 마우스를 올리면 가방 열기" Click="Hover_Click"/>
+                            <TextBlock Text="머무는 시간" Style="{StaticResource FieldLabel}" Margin="0,12,0,4"/>
+                            <Border Style="{StaticResource SegmentGroup}" HorizontalAlignment="Left">
+                                <StackPanel x:Name="HoverDelayPanel" Orientation="Horizontal"/>
+                            </Border>
                             <TextBlock x:Name="HoverUnsupportedText" Style="{StaticResource Note}" Visibility="Collapsed"
                                        Text="이 PC의 작업표시줄에서는 TaskPack 아이콘을 찾지 못해 지원하지 않습니다. 작업표시줄에 TaskPack을 고정한 Windows 11 기본 작업표시줄에서 동작합니다."/>
                             <CheckBox x:Name="AutostartSwitch" Style="{StaticResource Switch}" Margin="0,12,0,0"
                                       Content="Windows를 시작할 때 TaskPack 켜 두기" Click="Autostart_Click"/>
                             <TextBlock x:Name="AutostartNote" Style="{StaticResource Note}" Visibility="Collapsed"/>
                             <TextBlock Style="{StaticResource Note}"
-                                       Text="켜면 TaskPack이 뒤에서 계속 켜져 있고(메모리 약 10MB), 시계 옆에 아이콘이 생깁니다. 아이콘 위에 0.4초 머물면 가방이 열리고, 마우스가 떠나면 닫힙니다. 마우스 위치는 아이콘 위인지 판단하는 데만 쓰고 저장하거나 보내지 않습니다."/>
+                                       Text="켜면 TaskPack이 뒤에서 계속 켜져 있고(메모리 약 10MB), 시계 옆에 아이콘이 생깁니다. 아이콘 위에 정한 시간(기본 0.4초) 머물면 가방이 열리고, 마우스가 떠나면 닫힙니다. 너무 짧으면 지나가다 스칠 때도 열릴 수 있습니다. 마우스 위치는 아이콘 위인지 판단하는 데만 쓰고 저장하거나 보내지 않습니다."/>
                         </StackPanel>
                     </Border>
                     <Border Style="{StaticResource Card}">

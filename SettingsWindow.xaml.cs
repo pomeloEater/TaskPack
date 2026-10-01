@@ -484,9 +484,31 @@ public partial class SettingsWindow : Window
 
     // ───────────── 마우스를 올리면 열기 ─────────────
 
+    private void BuildHoverDelays()
+    {
+        HoverDelayPanel.Children.Clear();
+        var current = HoverDelay.Normalize(_config.HoverDelayMs);
+        foreach (var (label, ms) in HoverDelay.Options)
+        {
+            var option = new RadioButton
+            {
+                Content = label, GroupName = "HoverDelay", Style = (Style)FindResource("Segment"),
+                IsChecked = ms == current,
+            };
+            option.Checked += (_, _) =>
+            {
+                _config.HoverDelayMs = ms;
+                SaveConfig();
+            };
+            HoverDelayPanel.Children.Add(option);
+        }
+    }
+
     private void RefreshHover()
     {
         HoverSwitch.IsChecked = _config.HoverOpen;
+        BuildHoverDelays();
+        HoverDelayPanel.IsEnabled = _config.HoverOpen;
         RefreshAutostart();
         // 이 PC에서 TaskPack 아이콘을 찾을 수 있는지는 뒤에서 확인한다 (작업표시줄을 읽는 데 시간이 걸릴 수 있다)
         _ = ShowIfHoverUnsupportedAsync();
@@ -511,6 +533,7 @@ public partial class SettingsWindow : Window
     {
         HoverSetting.Apply(_config, HoverSwitch.IsChecked == true);
         SaveConfig();
+        HoverDelayPanel.IsEnabled = _config.HoverOpen;
         RefreshAutostart();
     }
 
