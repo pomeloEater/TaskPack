@@ -67,8 +67,8 @@ english.FinishedLabel=TaskPack has been installed.%n%nTo pin it to the taskbar, 
 english.FinishedLabelNoIcons=TaskPack has been installed.%n%nTo pin it to the taskbar, right-click TaskPack in the Start menu and choose 'Pin to taskbar'. (Windows does not allow programs to pin themselves.)
 
 [CustomMessages]
-korean.NeedDotNet=TaskPack을 실행하려면 .NET 8 데스크톱 런타임(x64)이 필요합니다.%n%n설치를 멈추고 다운로드 페이지를 열까요?%n(런타임을 설치한 뒤 이 설치 프로그램을 다시 실행해 주세요.)
-english.NeedDotNet=TaskPack requires the .NET 8 Desktop Runtime (x64).%n%nOpen the download page now?%n(Run this setup again after installing the runtime.)
+korean.NeedDotNet=TaskPack을 실행하려면 Microsoft의 무료 구성 요소인 .NET 8 데스크톱 런타임(x64)이 필요합니다.%n%n[예]를 누르면 설치를 멈추고 Microsoft 공식 사이트에서 런타임 설치 파일(약 56MB)을 바로 내려받습니다.%n받은 파일을 실행해 런타임을 설치한 뒤, 이 TaskPack 설치 프로그램을 다시 실행해 주세요.%n%n(직접 받으려면 dotnet.microsoft.com 다운로드 페이지에서 ".NET 데스크톱 런타임 8.0.x"의 Windows "설치 관리자 x64"를 받으세요.)
+english.NeedDotNet=TaskPack requires the .NET 8 Desktop Runtime (x64), a free component from Microsoft.%n%nChoose [Yes] to stop setup and download the runtime installer (about 56 MB) from Microsoft.%nRun it, then run this TaskPack setup again.%n%n(To get it yourself: on the dotnet.microsoft.com download page, pick ".NET Desktop Runtime 8.0.x" > Windows "Installer x64".)
 korean.DeleteData=가방 데이터(가방 목록, 칸 내용, 아이콘, 백업 전 보관본)도 지울까요?%n%n다시 설치해서 쓸 생각이면 '아니요'를 누르세요.
 english.DeleteData=Also delete your bags (tabs, items, icons, pre-restore copies)?%n%nChoose 'No' if you plan to reinstall.
 
@@ -91,7 +91,8 @@ begin
   if not IsDesktopRuntime8Installed then
   begin
     if SuppressibleMsgBox(CustomMessage('NeedDotNet'), mbConfirmation, MB_YESNO, IDYES) = IDYES then
-      ShellExec('open', 'https://dotnet.microsoft.com/download/dotnet/8.0', '', '', SW_SHOWNORMAL, ewNoWait, ErrorCode);
+      // Microsoft 공식 단축 주소: 항상 .NET 8 데스크톱 런타임 x64 최신 설치 파일로 연결된다
+      ShellExec('open', 'https://aka.ms/dotnet/8.0/windowsdesktop-runtime-win-x64.exe', '', '', SW_SHOWNORMAL, ewNoWait, ErrorCode);
     Result := False;
   end;
 end;
