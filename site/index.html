@@ -52,6 +52,8 @@
           <a class="btn ghost" href="https://github.com/pomeloEater/TaskPack" target="_blank" rel="noopener">GitHub에서 보기</a>
         </div>
         <p id="download-meta" class="meta reveal">무료 · MIT 라이선스 · Windows 10/11 64비트</p>
+        <p class="meta lite reveal">이미 .NET 8이 있다면 <a class="lite-download" href="https://github.com/pomeloEater/TaskPack/releases/latest">lite 버전</a>
+          (<span class="lite-size">약 5MB</span>)</p>
       </div>
 
       <!-- 직접 눌러 보는 미리보기 -->
@@ -122,6 +124,21 @@
           <h3>zip 하나로 백업</h3>
           <p>가방과 탭 아이콘, 작업표시줄 아이콘까지 파일 하나로 내보내고 새 PC에서 그대로 되살립니다.</p>
         </article>
+        <article class="slot-card">
+          <div class="slot-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" /><path d="M9 14c.8 1.2 2 1.8 3 1.8s2.2-.6 3-1.8" /><path d="M9.5 10h.01M14.5 10h.01" /></svg></div>
+          <h3>탭에 이모티콘</h3>
+          <p>컬러 이모티콘 68개 중에서 고르거나 직접 넣고, 이름은 숨겨 아이콘만 보이게 할 수도 있어요.</p>
+        </article>
+        <article class="slot-card">
+          <div class="slot-icon"><svg viewBox="0 0 24 24"><path d="M12 3v4M12 17v4M3 12h4M17 12h4" /><circle cx="12" cy="12" r="3" /></svg></div>
+          <h3>처음이어도 막힘없이</h3>
+          <p>빈 가방에는 "작업표시줄 앱 가져오기"와 "파일로 넣기" 버튼이 있고, 작업표시줄에 고정하라고 알려 줍니다.</p>
+        </article>
+        <article class="slot-card">
+          <div class="slot-icon"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 8-3 8h18s-3-1-3-8" /><path d="M10 20a2 2 0 0 0 4 0" /></svg></div>
+          <h3>새 버전 알림</h3>
+          <p>가방을 열 때 하루에 한 번 새 버전이 나왔는지만 확인해서 알려 드립니다. 보내는 정보는 없습니다.</p>
+        </article>
       </div>
     </section>
 
@@ -133,7 +150,7 @@
           <span class="step-no">1</span>
           <h3>내려받기</h3>
           <p><a class="inline-download" href="https://github.com/pomeloEater/TaskPack/releases/latest">TaskPack 설치 파일</a>을 내려받습니다.
-            <a href="#dotnet">.NET 8 데스크톱 런타임</a>이 필요하며, 없으면 설치 프로그램이 알려 줍니다.</p>
+            .NET이 들어 있어서 따로 설치할 것이 없습니다. (이미 .NET 8이 있다면 <a class="lite-download" href="https://github.com/pomeloEater/TaskPack/releases/latest">lite 버전</a>)</p>
         </li>
         <li>
           <span class="step-no">2</span>
@@ -152,8 +169,8 @@
         <div class="runtime-head">
           <span class="runtime-badge">.NET 8</span>
           <div>
-            <h3>먼저 .NET 8 데스크톱 런타임이 필요해요</h3>
-            <p>TaskPack을 돌리는 Microsoft 무료 구성 요소입니다. 이미 있으면 건너뛰어도 되고, 없으면 TaskPack 설치 프로그램이 알려 줍니다.</p>
+            <h3>lite 버전은 .NET 8 데스크톱 런타임이 필요해요</h3>
+            <p>기본 설치 파일에는 이미 들어 있어서 이 안내는 필요 없습니다. lite 버전(<span class="lite-size">약 5MB</span>)은 TaskPack을 돌리는 Microsoft 무료 구성 요소를 따로 설치해야 하며, 없으면 TaskPack 설치 프로그램이 알려 줍니다.</p>
           </div>
         </div>
         <div class="runtime-actions">
@@ -186,6 +203,14 @@
         <details>
           <summary>가방 정보는 어디에 저장되나요?</summary>
           <p>내 PC의 <code>%APPDATA%\TaskPack</code> 폴더에만 저장되고, 어디로도 보내지 않습니다. 프로그램을 지울 때 가방 데이터를 남길지 물어봅니다.</p>
+        </details>
+        <details>
+          <summary>기본 설치 파일과 lite 버전은 뭐가 달라요?</summary>
+          <p>.NET 8을 안에 넣었느냐의 차이뿐이고, 프로그램은 같습니다. 기본 설치 파일(약 51MB)은 따로 설치할 것이 없어서 처음 쓰는 분께 맞고, ARM PC에서는 이쪽을 쓰세요. lite 버전(<span class="lite-size">약 5MB</span>)은 .NET 8 데스크톱 런타임이 이미 있는 PC용입니다. 어느 쪽을 깔아도 같은 프로그램으로 덮어 설치됩니다.</p>
+        </details>
+        <details>
+          <summary>새 버전 확인은 무엇을 보내나요?</summary>
+          <p>아무것도 보내지 않습니다. 가방을 열 때 하루에 한 번 GitHub 공개 주소에서 최신 버전 번호만 읽어 옵니다. 설정 → 기본 설정 → 버전에서 끌 수 있습니다.</p>
         </details>
         <details>
           <summary>이름이 왜 "아버지가방에들어가신다"예요?</summary>

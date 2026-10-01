@@ -94,6 +94,8 @@ h1 {
 .btn.ghost { border: 1.5px solid var(--line); background: var(--card); }
 .btn.ghost:hover { border-color: var(--muted); }
 .meta { margin: 14px 0 0; font-size: 13.5px; color: var(--muted); }
+.meta.lite { margin-top: 4px; }
+.meta.lite a { color: var(--teal); font-weight: 600; text-underline-offset: 3px; }
 
 /* 등장 애니메이션 (차례로) */
 .reveal { opacity: 0; transform: translateY(14px); animation: rise .7s cubic-bezier(.2, .7, .2, 1) forwards; }

@@ -94,17 +94,26 @@
   setTimeout(() => drawer.classList.add('nudge'), 2600);
 
   // ───────── 최신 릴리스 다운로드 연결 ─────────
-  // 실패하면 버튼은 GitHub 릴리스 페이지를 그대로 가리킨다
+  // 설치 파일은 두 가지: TaskPack-Setup-<버전>.exe (.NET 포함, 기본)과 TaskPack-Setup-<버전>-lite.exe (.NET 8을 따로 설치).
+  // 파일 이름의 "-lite"로 둘을 가른다. 실패하거나 못 찾으면 링크는 GitHub 릴리스 페이지를 그대로 가리킨다
+  const mb = (bytes) => (bytes / 1024 / 1024).toFixed(1);
   fetch(`https://api.github.com/repos/${REPO}/releases/latest`)
     .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
     .then((release) => {
-      const asset = (release.assets || []).find((a) => /\.exe$/i.test(a.name));
-      if (!asset) return;
-      document.querySelectorAll('#download, .inline-download').forEach((a) => { a.href = asset.browser_download_url; });
-      const mb = (asset.size / 1024 / 1024).toFixed(1);
+      const exes = (release.assets || []).filter((a) => /\.exe$/i.test(a.name));
+      const lite = exes.find((a) => /-lite\.exe$/i.test(a.name));
+      const full = exes.find((a) => !/-lite\.exe$/i.test(a.name));
       const version = String(release.tag_name || '').replace(/^v/, '');
-      document.getElementById('download-meta').textContent =
-        `v${version} · ${mb}MB · 무료 · MIT 라이선스 · Windows 10/11 64비트`;
+
+      if (full) {
+        document.querySelectorAll('#download, .inline-download').forEach((a) => { a.href = full.browser_download_url; });
+        document.getElementById('download-meta').textContent =
+          `v${version} · ${mb(full.size)}MB · 무료 · MIT 라이선스 · Windows 10/11 64비트`;
+      }
+      if (lite) {
+        document.querySelectorAll('.lite-download').forEach((a) => { a.href = lite.browser_download_url; });
+        document.querySelectorAll('.lite-size').forEach((el) => { el.textContent = `약 ${mb(lite.size)}MB`; });
+      }
     })
     .catch(() => {});
 })();
