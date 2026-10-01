@@ -40,7 +40,9 @@
 
 `TaskPack-Setup-<버전>.exe`를 실행합니다.
 
-- 필요한 것: [.NET 8 데스크톱 런타임 (x64)](https://dotnet.microsoft.com/download/dotnet/8.0). 없으면 설치 프로그램이 다운로드 페이지를 열어 줍니다.
+- 필요한 것: **.NET 8 데스크톱 런타임 (x64)**. 없으면 설치 프로그램이 알려 줍니다.
+  - 바로 받기: [Microsoft 공식 설치 파일 (Windows x64, 약 56MB)](https://aka.ms/dotnet/8.0/windowsdesktop-runtime-win-x64.exe) — 항상 8.0 최신판으로 연결됩니다.
+  - 또는 [다운로드 페이지](https://dotnet.microsoft.com/download/dotnet/8.0)에서 **.NET 데스크톱 런타임 8.0.x**(.NET Desktop Runtime) 항목의 Windows **설치 관리자 x64**를 받으세요. SDK, ASP.NET Core 런타임, 그냥 .NET 런타임이 아닙니다.
 - 기본은 관리자 권한 없이 내 계정에만 설치합니다(`%LOCALAPPDATA%\Programs\TaskPack`). 시작할 때 "모든 사용자용"을 고를 수도 있습니다.
 - 선택 항목: 설치 경로, 바탕화면 아이콘, 설치 후 실행
 - 제거는 Windows 설정 → 앱에서 합니다. 제거할 때 가방 데이터도 지울지 묻습니다(기본: 보관).
