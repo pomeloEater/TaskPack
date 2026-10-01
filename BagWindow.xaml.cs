@@ -54,6 +54,7 @@ public partial class BagWindow : Window
     private int _modalDepth;         // 메시지 창·대화상자가 떠 있는 동안 자동으로 닫히지 않게 한다
     private int _pressedIndex = -1;  // 마우스를 누른 칸 (클릭과 끌기를 구분)
     private Bag? _pressedTab;        // 마우스를 누른 탭 (클릭과 끌기를 구분)
+    private int _menuSlot;           // 가방 메뉴를 연 칸 ("파일로 넣기"를 채우기 시작할 칸)
     private Point _pressPoint;
 
     // openSettings: 처음 실행이면 가방이 뜬 뒤 설정 창을 바로 연다
@@ -76,6 +77,7 @@ public partial class BagWindow : Window
         {
             Items =
             {
+                MenuItemFor("파일로 넣기…", AddFilesFromDialog),
                 MenuItemFor("작업표시줄 앱 가져오기…", ImportPinnedApps),
                 MenuItemFor("Windows 앱 목록 열기 (끌어서 넣기)", OpenAppsFolder),
                 new Separator(),
@@ -84,6 +86,8 @@ public partial class BagWindow : Window
         };
         RootBorder.DragOver += Background_DragOver;
         RootBorder.Drop += Background_Drop;
+        // 우클릭한 곳이 빈칸이면 "파일로 넣기"를 그 칸부터 채운다 (빈 곳이면 첫 칸부터)
+        RootBorder.PreviewMouseRightButtonDown += (_, e) => _menuSlot = SlotIndexAt(e.OriginalSource as DependencyObject) ?? 0;
 
         ApplyTheme();
         BuildTabs();
@@ -936,6 +940,31 @@ public partial class BagWindow : Window
     }
 
     // 시작 메뉴의 모든 앱이 담긴 창을 연다. 거기서 끌어 넣는 동안 가방이 닫히지 않게 📌을 켠다
+    // 파일 고르기 창으로 exe·바로가기·아무 파일이나 여러 개 골라 넣는다. 창이 떠 있는 동안 가방은 닫히지 않는다
+    private void AddFilesFromDialog()
+    {
+        var dialog = new Microsoft.Win32.OpenFileDialog
+        {
+            Title = "가방에 넣을 파일 고르기",
+            Multiselect = true,
+            DereferenceLinks = false, // 바로가기는 바로가기 그대로 넣는다 (실행 인자·작업 폴더 유지)
+            Filter = "프로그램·바로가기|*.exe;*.lnk;*.url;*.bat;*.cmd|모든 파일|*.*",
+        };
+        if (WithModal(() => dialog.ShowDialog(this)) != true)
+            return;
+        AddItems(dialog.FileNames.Select(f => (f, (string?)null)).ToList(), _menuSlot);
+    }
+
+    // 눌린 요소에서 위로 올라가며 가방 칸을 찾아 칸 번호를 돌려준다
+    private static int? SlotIndexAt(DependencyObject? element)
+    {
+        // 글자 조각(Run 등)은 화면 요소가 아니라서 논리 트리로 부모를 찾는다
+        for (var node = element; node is not null; node = node is Visual ? VisualTreeHelper.GetParent(node) : LogicalTreeHelper.GetParent(node))
+            if (node is Border { Tag: int index })
+                return index;
+        return null;
+    }
+
     private void OpenAppsFolder()
     {
         PinButton.IsChecked = true;
