@@ -221,6 +221,10 @@ h2 { margin: 0; font-size: clamp(28px, 3.6vw, 42px); font-weight: 850; letter-sp
   transition: transform .2s ease, border-color .2s;
 }
 .slot-card:hover { transform: translateY(-3px); border-color: color-mix(in srgb, var(--teal) 45%, var(--line)); }
+/* 3열일 때 마지막 카드가 혼자 한 줄에 남으면 가로로 펼친다 */
+@media (min-width: 901px) {
+  .features .slot-card:last-child:nth-child(3n+1) { grid-column: 1 / -1; }
+}
 .slot-icon {
   width: 46px; height: 46px; border-radius: 12px; display: grid; place-items: center; margin-bottom: 14px;
   background: color-mix(in srgb, var(--teal) 14%, transparent); color: var(--teal);
