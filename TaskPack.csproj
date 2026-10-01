@@ -11,7 +11,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyName>TaskPack</AssemblyName>
-    <Version>1.2.0</Version>
+    <Version>1.2.1</Version>
     <RootNamespace>TaskPack</RootNamespace>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <!-- tools\make-icon.ps1 로 만든 서류가방 + 구두 아이콘 -->
