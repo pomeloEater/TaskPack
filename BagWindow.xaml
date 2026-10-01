@@ -176,6 +176,20 @@
             </DockPanel>
             <!-- 알림 띠: 가방 아래에 쌓인다. 너비는 BuildGrid가 칸 너비에 맞춘다 -->
             <StackPanel x:Name="NoticePanel" DockPanel.Dock="Bottom" HorizontalAlignment="Center">
+                <Border x:Name="UpdateNotice" Visibility="Collapsed" Margin="0,8,0,0" Padding="10,6,6,6"
+                        CornerRadius="6" Background="{DynamicResource SlotBrush}">
+                    <DockPanel>
+                        <Button DockPanel.Dock="Right" Style="{StaticResource GlyphButtonStyle}" VerticalAlignment="Center"
+                                ToolTip="이 버전은 다시 알리지 않기" Click="DismissUpdateNotice_Click">
+                            <TextBlock Text="&#xE711;" FontFamily="{StaticResource IconFont}" FontSize="11"
+                                       Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                        </Button>
+                        <Button DockPanel.Dock="Right" Style="{StaticResource ActionButtonStyle}" Padding="10,3" Margin="6,0,2,0"
+                                VerticalAlignment="Center" Content="받기" Click="UpdateNotice_Click"/>
+                        <TextBlock x:Name="UpdateNoticeText" TextWrapping="Wrap" VerticalAlignment="Center"
+                                   Foreground="{DynamicResource TextBrush}"/>
+                    </DockPanel>
+                </Border>
                 <Border x:Name="PinNotice" Visibility="Collapsed" Margin="0,8,0,0" Padding="10,6,6,6"
                         CornerRadius="6" Background="{DynamicResource SlotBrush}">
                     <DockPanel>

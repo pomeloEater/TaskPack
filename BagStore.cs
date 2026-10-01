@@ -46,6 +46,11 @@ public sealed class DrawerConfig
     public string? DrawerIcon { get; set; }          // TaskPack 폴더 기준 상대 경로 또는 exe·dll 절대 경로
     public string Theme { get; set; } = TaskPack.Theme.FollowSystem;
     public bool HidePinNotice { get; set; }          // 가방 아래 "작업표시줄에 고정하면…" 알림을 다시 보지 않기
+    public bool AutoUpdateCheck { get; set; } = true; // 가방을 열 때 새 버전을 하루에 한 번 확인
+    public DateTimeOffset? LastUpdateCheck { get; set; }
+    public string? LatestVersion { get; set; }       // 마지막으로 확인한 최신 버전
+    public string? LatestUrl { get; set; }           // 그 버전의 같은 판 설치 파일 주소 (없으면 릴리스 페이지)
+    public string? SkippedVersion { get; set; }      // ×로 건너뛴 버전. 다음 버전이 나오면 다시 알린다
 }
 
 // %APPDATA%\TaskPack 아래의 설정과 가방을 읽고 쓴다

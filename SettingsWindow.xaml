@@ -151,6 +151,23 @@
                                        Text="모든 가방의 기본 테마입니다. 가방 페이지에서 가방마다 따로 정한 테마가 있으면 그쪽을 따릅니다."/>
                         </StackPanel>
                     </Border>
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <TextBlock Text="버전" Style="{StaticResource FieldLabel}"/>
+                            <TextBlock x:Name="CurrentVersionText" TextWrapping="Wrap"/>
+                            <TextBlock x:Name="LatestVersionText" TextWrapping="Wrap" Margin="0,4,0,12"/>
+                            <StackPanel Orientation="Horizontal">
+                                <Button x:Name="CheckUpdateButton" Content="지금 확인" Style="{StaticResource SecondaryButton}" Padding="12,6"
+                                        Click="CheckUpdate_Click"/>
+                                <Button x:Name="GetUpdateButton" Content="받기" Style="{StaticResource PrimaryButton}" Padding="12,6"
+                                        Margin="6,0,0,0" Visibility="Collapsed" Click="GetUpdate_Click"/>
+                            </StackPanel>
+                            <CheckBox x:Name="AutoUpdateSwitch" Style="{StaticResource Switch}" Margin="0,14,0,0"
+                                      Content="새 버전 자동 확인" Click="AutoUpdate_Click"/>
+                            <TextBlock Style="{StaticResource Note}"
+                                       Text="가방을 열 때 하루에 한 번, GitHub 공개 주소에서 최신 버전 정보만 읽어 옵니다. 보내는 정보는 없습니다."/>
+                        </StackPanel>
+                    </Border>
                 </StackPanel>
             </ScrollViewer>
             <!-- 백업 -->

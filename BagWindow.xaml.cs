@@ -96,6 +96,7 @@ public partial class BagWindow : Window
             PlaceNearTaskbar();
             AnimateIn();
             Activate();
+            _ = CheckForUpdateAsync();
         };
         // 탭을 바꿔 크기가 달라지거나, 다른 배율의 모니터로 옮겨지면 다시 배치
         SizeChanged += (_, _) => { if (_placed) Reposition(); };
@@ -616,9 +617,50 @@ public partial class BagWindow : Window
     private void RefreshEmptyState() =>
         EmptyPanel.Visibility = _bag.Slots.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
 
-    // 작업표시줄에 고정되어 있지 않고 "다시 보지 않기"도 누르지 않았으면 고정 알림 띠를 보여 준다
-    private void RefreshNotices() =>
+    // 가방 아래 알림 띠: 새 버전(위)과 작업표시줄 고정(아래). 고정 알림은 이미 고정했거나 "다시 보지 않기"를 눌렀으면 숨긴다
+    private void RefreshNotices()
+    {
+        var update = UpdateCheck.HasNotice(_config);
+        UpdateNotice.Visibility = update ? Visibility.Visible : Visibility.Collapsed;
+        if (update)
+            UpdateNoticeText.Text = $"새 버전 {UpdateCheck.ParseVersion(_config.LatestVersion)}이 나왔어요";
         PinNotice.Visibility = !_config.HidePinNotice && !Drawer.IsPinned() ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    // 마지막 확인 뒤 24시간이 지났으면 뒤에서 조회한다. 실패하면 조용히 넘어가고 다음에 다시 시도한다
+    private async Task CheckForUpdateAsync()
+    {
+        if (!UpdateCheck.IsDue(_config, DateTimeOffset.Now))
+            return;
+        var release = await UpdateCheck.FetchLatestAsync();
+        if (_closed || release is null)
+            return;
+        UpdateCheck.Apply(_config, release, DateTimeOffset.Now);
+        SaveConfig();
+        RefreshNotices();
+    }
+
+    private void UpdateNotice_Click(object sender, RoutedEventArgs e)
+    {
+        if (_config.LatestUrl is not { } url)
+            return;
+        try
+        {
+            Process.Start(new ProcessStartInfo(url) { UseShellExecute = true })?.Dispose();
+        }
+        catch (Win32Exception ex)
+        {
+            ShowMessage($"브라우저를 열지 못했습니다.\n\n{ex.Message}", MessageBoxImage.Error);
+        }
+    }
+
+    // 이 버전은 다시 알리지 않는다 (다음 버전이 나오면 다시 알림)
+    private void DismissUpdateNotice_Click(object sender, RoutedEventArgs e)
+    {
+        _config.SkippedVersion = _config.LatestVersion;
+        SaveConfig();
+        UpdateNotice.Visibility = Visibility.Collapsed;
+    }
 
     private void EmptyImport_Click(object sender, RoutedEventArgs e) => ImportPinnedApps();
 

@@ -20,7 +20,20 @@
     <SelfContained>false</SelfContained>
     <!-- 미리 컴파일해 두어 작업표시줄 아이콘을 누른 뒤 가방이 뜨는 시간을 줄인다 -->
     <PublishReadyToRun>true</PublishReadyToRun>
+    <!-- 설치 파일 판: 기본은 .NET을 따로 설치하는 lite, SelfContained로 게시하면 full. 새 버전 알림이 같은 판의 파일을 고르는 데 쓴다 -->
+    <TaskPackEdition>lite</TaskPackEdition>
+    <TaskPackEdition Condition="'$(SelfContained)' == 'true'">full</TaskPackEdition>
   </PropertyGroup>
+
+  <ItemGroup>
+    <AssemblyMetadata Include="Edition" Value="$(TaskPackEdition)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- 시험 프로젝트(tests\)의 소스는 앱에 넣지 않고, 시험이 internal 클래스를 볼 수 있게 연다 -->
+    <Compile Remove="tests\**" />
+    <InternalsVisibleTo Include="TaskPack.Tests" />
+  </ItemGroup>
 
   <ItemGroup>
     <!-- Pretendard(SIL OFL 1.1)를 exe 안에 넣는다. 라이선스 전문은 assets\fonts\OFL.txt (설치 폴더에도 복사) -->

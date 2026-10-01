@@ -27,6 +27,7 @@ public partial class SettingsWindow : Window
         BuildGlobalModes();
         BuildBagList(_bags.FirstOrDefault());
         RefreshDrawer();
+        RefreshVersion();
         // 탐색기에서 고정하고 돌아오면 고정 여부를 다시 확인한다
         Activated += (_, _) => RefreshDrawer();
     }
@@ -418,6 +419,72 @@ public partial class SettingsWindow : Window
 
         ShowMessage(Drawer.PinGuide, MessageBoxImage.Information);
         Drawer.RevealInExplorer(lnk);
+    }
+
+    // ───────────── 버전 ─────────────
+
+    private void RefreshVersion()
+    {
+        var edition = UpdateCheck.Edition == "full" ? ".NET 포함판" : "가벼운 판";
+        CurrentVersionText.Text = $"현재 버전 {UpdateCheck.Current.ToString(3)} ({edition})";
+        AutoUpdateSwitch.IsChecked = _config.AutoUpdateCheck;
+
+        var latest = UpdateCheck.ParseVersion(_config.LatestVersion);
+        var newer = latest is not null && latest > UpdateCheck.Current;
+        LatestVersionText.Text = latest is null ? "아직 확인하지 않았습니다."
+            : newer ? $"최신 버전 {latest.ToString(3)} — 새 버전이 나왔어요."
+            : $"최신 버전 {latest.ToString(3)} — 최신 버전을 쓰고 있어요.";
+        GetUpdateButton.Visibility = newer ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    private async void CheckUpdate_Click(object sender, RoutedEventArgs e)
+    {
+        CheckUpdateButton.IsEnabled = false;
+        CheckUpdateButton.Content = "확인 중…";
+        var release = await UpdateCheck.FetchLatestAsync();
+        CheckUpdateButton.Content = "지금 확인";
+        CheckUpdateButton.IsEnabled = true;
+
+        if (release is null)
+        {
+            LatestVersionText.Text = "확인하지 못했습니다. 인터넷 연결을 확인하고 다시 눌러 주세요.";
+            return;
+        }
+        UpdateCheck.Apply(_config, release, DateTimeOffset.Now);
+        SaveConfig();
+        RefreshVersion();
+    }
+
+    private void GetUpdate_Click(object sender, RoutedEventArgs e)
+    {
+        if (_config.LatestUrl is not { } url)
+            return;
+        try
+        {
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(url) { UseShellExecute = true })?.Dispose();
+        }
+        catch (System.ComponentModel.Win32Exception ex)
+        {
+            ShowMessage($"브라우저를 열지 못했습니다.\n\n{ex.Message}", MessageBoxImage.Error);
+        }
+    }
+
+    private void AutoUpdate_Click(object sender, RoutedEventArgs e)
+    {
+        _config.AutoUpdateCheck = AutoUpdateSwitch.IsChecked == true;
+        SaveConfig();
+    }
+
+    private void SaveConfig()
+    {
+        try
+        {
+            BagStore.SaveConfig(_config);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            ShowMessage($"설정을 저장하지 못했습니다.\n\n{ex.Message}", MessageBoxImage.Error);
+        }
     }
 
     // ───────────── 백업 ─────────────
