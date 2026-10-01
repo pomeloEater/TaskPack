@@ -12,13 +12,21 @@
   #define OutputSuffix ""
   #define PublishDir "publish"
 #endif
+; 시험용(/DTestBuild=1): 실제 설치와 섞이지 않게 다른 AppId를 쓰고, 시작 메뉴·바탕화면 바로가기를 만들거나 지우지 않는다
+#ifdef TestBuild
+  #define AppGuid "{{7C1F5D0B-3A4E-4F8C-8B2D-6E9A1C3D5F72}"
+  #define TestSuffix "-test"
+#else
+  #define AppGuid "{{6B0E4C9A-2F3D-4E7B-9C1A-5D8F7E2B4A61}"
+  #define TestSuffix ""
+#endif
 #define AppName "TaskPack"
 #define AppExe "TaskPack.exe"
 ; 작업표시줄에서 TaskPack 아이콘 아래에 "실행 중"으로 묶이려면 바로가기와 프로그램이 같은 식별자를 써야 한다 (Drawer.AppId)
 #define AppUserModelId "TaskPack.Drawer"
 
 [Setup]
-AppId={{6B0E4C9A-2F3D-4E7B-9C1A-5D8F7E2B4A61}
+AppId={#AppGuid}
 AppName={#AppName}
 AppVersion={#AppVersion}
 AppPublisher=TaskPack
@@ -35,10 +43,10 @@ SetupIconFile=..\assets\TaskPack.ico
 WizardSmallImageFile=wizard-small.bmp
 UninstallDisplayIcon={app}\{#AppExe}
 UninstallDisplayName={#AppName}
-; 실행 중인 TaskPack이 있으면 닫고 설치·제거한다
+; 창이 있는 TaskPack은 여기서 닫고, 창 없이 상주하는 TaskPack은 아래 [Code]가 끝낸다
 CloseApplications=yes
 OutputDir=Output
-OutputBaseFilename=TaskPack-Setup-{#AppVersion}{#OutputSuffix}
+OutputBaseFilename=TaskPack-Setup-{#AppVersion}{#OutputSuffix}{#TestSuffix}
 Compression=lzma2
 SolidCompression=yes
 ShowLanguageDialog=auto
@@ -76,16 +84,20 @@ Source: "..\LICENSE"; DestDir: "{app}\licenses"; DestName: "TaskPack-LICENSE.txt
 Source: "..\assets\fonts\OFL.txt"; DestDir: "{app}\licenses"; DestName: "Pretendard-OFL.txt"; Flags: ignoreversion
 Source: "..\assets\emoji\LICENSE"; DestDir: "{app}\licenses"; DestName: "FluentEmoji-LICENSE.txt"; Flags: ignoreversion
 
+#ifndef TestBuild
 [Icons]
 Name: "{autoprograms}\{#AppName}"; Filename: "{app}\{#AppExe}"; AppUserModelID: "{#AppUserModelId}"
 Name: "{autodesktop}\{#AppName}"; Filename: "{app}\{#AppExe}"; AppUserModelID: "{#AppUserModelId}"; Tasks: desktopicon
+#endif
 
 [Run]
 Filename: "{app}\{#AppExe}"; Description: "{cm:LaunchProgram,{#AppName}}"; Flags: nowait postinstall skipifsilent
 
+#ifndef TestBuild
 [UninstallDelete]
 ; 프로그램 안의 "작업표시줄에 고정하기"가 만든 시작 메뉴 바로가기
 Type: files; Name: "{userprograms}\{#AppName}.lnk"
+#endif
 
 [Messages]
 ; 완료 화면 문구는 바로가기 폴더를 만든 경우(FinishedLabel)와 아닌 경우(FinishedLabelNoIcons)가 따로 있어 둘 다 바꾼다
@@ -101,6 +113,41 @@ korean.DeleteData=가방 데이터(가방 목록, 칸 내용, 아이콘, 백업 
 english.DeleteData=Also delete your bags (tabs, items, icons, pre-restore copies)?%n%nChoose 'No' if you plan to reinstall.
 
 [Code]
+var
+  TaskPackWasRunning: Boolean;
+
+// 실행 중인 TaskPack을 끝낸다. 마우스를 올리면 열기를 켠 TaskPack은 창 없이 뒤에서 켜져 있어서 닫기 요청을 받지 못한다.
+// 끝냈으면 true (실행 중이던 것이 없으면 taskkill이 0이 아닌 값을 돌려준다)
+function StopTaskPack: Boolean;
+var
+  ResultCode: Integer;
+begin
+  Result := Exec(ExpandConstant('{sys}\taskkill.exe'), '/F /IM {#AppExe}', '', SW_HIDE, ewWaitUntilTerminated, ResultCode) and (ResultCode = 0);
+end;
+
+// 설치 파일을 복사하기 전에 실행 중인 TaskPack을 끝낸다
+function PrepareToInstall(var NeedsRestart: Boolean): String;
+begin
+  TaskPackWasRunning := StopTaskPack;
+  Result := '';
+end;
+
+// 설치가 끝나면, 실행 중이던 TaskPack은 (상주였다면 상주로) 다시 켠다. 설정이 꺼져 있으면 아무것도 하지 않고 끝난다
+procedure CurStepChanged(CurStep: TSetupStep);
+var
+  ResultCode: Integer;
+begin
+  if (CurStep = ssPostInstall) and TaskPackWasRunning then
+    Exec(ExpandConstant('{app}\{#AppExe}'), '--background', '', SW_SHOW, ewNoWait, ResultCode);
+end;
+
+// 제거하기 전에 실행 중인 TaskPack을 끝낸다
+function InitializeUninstall: Boolean;
+begin
+  StopTaskPack;
+  Result := True;
+end;
+
 // 같은 폴더에 이미 TaskPack이 설치되어 있는지 (덮어 설치 정리 대상)
 function IsExistingInstall: Boolean;
 begin
@@ -147,6 +194,12 @@ procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 var
   DataDir: String;
 begin
+  // Windows를 시작할 때 켜 두는 항목(내 계정의 시작 프로그램)을 지운다
+  if CurUninstallStep = usUninstall then
+  begin
+    RegDeleteValue(HKCU, 'Software\Microsoft\Windows\CurrentVersion\Run', '{#AppName}');
+    RegDeleteValue(HKCU, 'Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run', '{#AppName}');
+  end;
   if CurUninstallStep = usPostUninstall then
   begin
     DataDir := ExpandConstant('{userappdata}\TaskPack');
