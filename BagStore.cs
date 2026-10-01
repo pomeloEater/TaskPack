@@ -45,6 +45,7 @@ public sealed class DrawerConfig
     public string? LastTab { get; set; }
     public string? DrawerIcon { get; set; }          // TaskPack 폴더 기준 상대 경로 또는 exe·dll 절대 경로
     public string Theme { get; set; } = TaskPack.Theme.FollowSystem;
+    public bool HidePinNotice { get; set; }          // 가방 아래 "작업표시줄에 고정하면…" 알림을 다시 보지 않기
 }
 
 // %APPDATA%\TaskPack 아래의 설정과 가방을 읽고 쓴다
@@ -106,9 +107,6 @@ public static class BagStore
     }
 
     public static void SaveConfig(DrawerConfig config) => WriteJson(ConfigFile, config);
-
-    // 설정 파일이 아직 없으면 처음 실행한 것이다
-    public static bool IsFirstRun => !File.Exists(ConfigFile);
 
     // ───────────── 가방 ─────────────
 

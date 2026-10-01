@@ -22,7 +22,6 @@ public partial class App : Application
         // 고정한 작업표시줄 바로가기와 같은 식별자를 써야 작업표시줄 아이콘 아래에 "실행 중"으로 묶인다
         NativeMethods.SetCurrentProcessExplicitAppUserModelID(Drawer.AppId);
 
-        var firstRun = BagStore.IsFirstRun; // LoadConfig가 설정 파일을 만들기 전에 확인
         DrawerConfig config;
         List<Bag> bags;
         try
@@ -38,6 +37,6 @@ public partial class App : Application
             return;
         }
 
-        new BagWindow(config, bags, openSettings: firstRun).Show();
+        new BagWindow(config, bags).Show();
     }
 }

@@ -31,7 +31,13 @@ internal static class Drawer
 
     public static bool IsPinned() =>
         Directory.Exists(PinnedDir) &&
-        Directory.EnumerateFiles(PinnedDir, "*.lnk").Any(lnk => ShellLink.ReadAppId(lnk) == AppId);
+        Directory.EnumerateFiles(PinnedDir, "*.lnk").Any(IsOwnLink);
+
+    // TaskPack을 여는 바로가기인지. 식별자가 같거나, 식별자는 비어 있어도(실행 중인 창을 직접 고정한 경우) 대상이 TaskPack.exe이면 맞다
+    private static bool IsOwnLink(string lnk) =>
+        ShellLink.ReadAppId(lnk) == AppId ||
+        ShellLink.ReadTarget(lnk) is { } target &&
+        Path.GetFileName(target.Path).Equals(Path.GetFileName(ExePath), StringComparison.OrdinalIgnoreCase);
 
     // 모든 사용자용으로 설치했을 때 설치 프로그램이 만드는 시작 메뉴 바로가기
     private static readonly string CommonStartMenuLink = Path.Combine(
@@ -48,6 +54,12 @@ internal static class Drawer
         ShellLink.Create(StartMenuLink, ExePath, "", IconPath(config), 0, AppId, "TaskPack 가방");
         return StartMenuLink;
     }
+
+    // 작업표시줄 고정은 Windows가 프로그램의 자동 고정을 막고 있어 사용자가 직접 해야 한다. 바로가기를 만든 뒤 보여 주는 안내
+    public const string PinGuide = "시작 메뉴에 TaskPack 바로가기를 만들었습니다.\n\n" +
+                                   "확인을 누르면 탐색기가 열립니다.\n" +
+                                   "TaskPack 바로가기를 우클릭 → '작업 표시줄에 고정'을 눌러 주세요.\n" +
+                                   "(메뉴에 없으면 '더 많은 옵션 표시' 안에 있습니다. 시작 메뉴에서 TaskPack을 검색해 고정해도 됩니다.)";
 
     public static void RevealInExplorer(string path) =>
         Process.Start("explorer.exe", $"/select,\"{path}\"")?.Dispose();
@@ -123,7 +135,7 @@ internal static class Drawer
     public static List<string> PinnedApps() =>
         Directory.Exists(PinnedDir)
             ? Directory.EnumerateFiles(PinnedDir, "*.lnk")
-                .Where(lnk => ShellLink.ReadAppId(lnk) != AppId)
+                .Where(lnk => !IsOwnLink(lnk))
                 .OrderBy(Path.GetFileNameWithoutExtension, StringComparer.CurrentCultureIgnoreCase)
                 .ToList()
             : new List<string>();

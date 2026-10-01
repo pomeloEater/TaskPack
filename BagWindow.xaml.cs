@@ -20,7 +20,7 @@ public partial class BagWindow : Window
     private const string SlotDataFormat = "TaskPack.Slot";   // 값: "<가방 id>|<칸 번호>"
     private const string TabDataFormat = "TaskPack.Tab";     // 값: 가방 id
     private const double SlotOuterWidth = 84;   // 칸 너비 80 + 좌우 여백 2씩
-    private const double MinHintWidth = 240;
+    private const double MinNoticeWidth = 240;
     private const int ScreenGap = 8;            // 작업표시줄·화면 가장자리와 띄울 거리 (DIP)
     private const int ErrorCancelled = 1223;    // 사용자가 권한 확인 창(UAC)에서 취소
 
@@ -39,7 +39,6 @@ public partial class BagWindow : Window
     private readonly Dictionary<Bag, Border> _tabs = new();
     private Bag? _editingBag;                           // 이름을 고치는 중인 탭
     private TextBox? _editBox;
-    private Bag? _newBag;                               // 이번에 "+ 새 가방"으로 만든 가방 (안내 문구를 보여 줄 대상)
 
     private readonly EventWaitHandle _signal;
     private readonly RegisteredWaitHandle _signalWait;
@@ -57,16 +56,13 @@ public partial class BagWindow : Window
     private int _menuSlot;           // 가방 메뉴를 연 칸 ("파일로 넣기"를 채우기 시작할 칸)
     private Point _pressPoint;
 
-    // openSettings: 처음 실행이면 가방이 뜬 뒤 설정 창을 바로 연다
-    public BagWindow(DrawerConfig config, List<Bag> bags, bool openSettings = false)
+    public BagWindow(DrawerConfig config, List<Bag> bags)
     {
         InitializeComponent();
         GetCursorPos(out _anchor);
         _config = config;
         _bags = bags;
         _bag = bags.Find(b => b.Id == config.LastTab) ?? bags[0];
-        if (openSettings)
-            _modalDepth++; // 설정 창이 뜨기 전에 포커스를 잃어도 닫히지 않게 (OpenSettings에서 푼다)
 
         // 다른 TaskPack 프로세스가 신호를 보내면(작업표시줄 아이콘 재클릭) 닫는다
         _signal = new EventWaitHandle(false, EventResetMode.AutoReset, SignalName);
@@ -100,12 +96,6 @@ public partial class BagWindow : Window
             PlaceNearTaskbar();
             AnimateIn();
             Activate();
-            if (openSettings)
-                Dispatcher.InvokeAsync(() =>
-                {
-                    _modalDepth--;
-                    OpenSettings();
-                }, DispatcherPriority.Loaded);
         };
         // 탭을 바꿔 크기가 달라지거나, 다른 배율의 모니터로 옮겨지면 다시 배치
         SizeChanged += (_, _) => { if (_placed) Reposition(); };
@@ -479,7 +469,6 @@ public partial class BagWindow : Window
         }
         _bags.Add(bag);
         _config.Tabs.Add(bag.Id);
-        _newBag = bag;
         SelectBag(bag);
         BeginEdit(bag);
     }
@@ -564,8 +553,9 @@ public partial class BagWindow : Window
             SlotGrid.Children.Add(_slots[i].Cell);
             RefreshSlot(i);
         }
-        HintText.MaxWidth = Math.Max(_bag.Columns * SlotOuterWidth, MinHintWidth) - 8;
-        RefreshHint();
+        NoticePanel.Width = Math.Max(_bag.Columns * SlotOuterWidth, MinNoticeWidth) - 8;
+        RefreshEmptyState();
+        RefreshNotices();
     }
 
     private SlotView CreateSlot(int index)
@@ -622,11 +612,44 @@ public partial class BagWindow : Window
         };
     }
 
-    // 안내 문구는 방금 만든 빈 가방, 또는 처음 설치해서 빈 가방 하나뿐일 때만 보인다
-    private void RefreshHint()
+    // 아이템이 하나도 없는 가방에는 가운데에 시작 버튼을 보여 준다
+    private void RefreshEmptyState() =>
+        EmptyPanel.Visibility = _bag.Slots.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+
+    // 작업표시줄에 고정되어 있지 않고 "다시 보지 않기"도 누르지 않았으면 고정 알림 띠를 보여 준다
+    private void RefreshNotices() =>
+        PinNotice.Visibility = !_config.HidePinNotice && !Drawer.IsPinned() ? Visibility.Visible : Visibility.Collapsed;
+
+    private void EmptyImport_Click(object sender, RoutedEventArgs e) => ImportPinnedApps();
+
+    private void EmptyAddFiles_Click(object sender, RoutedEventArgs e)
     {
-        var isNew = _bag == _newBag || _bags.Count == 1;
-        HintText.Visibility = isNew && _bag.Slots.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+        _menuSlot = 0;
+        AddFilesFromDialog();
+    }
+
+    private void DismissPinNotice_Click(object sender, RoutedEventArgs e)
+    {
+        _config.HidePinNotice = true;
+        SaveConfig();
+        PinNotice.Visibility = Visibility.Collapsed;
+    }
+
+    // 설정의 "작업표시줄에 고정하기…"와 같은 동작: 시작 메뉴 바로가기를 만들고 탐색기에서 보여 준다
+    private void PinNotice_Click(object sender, RoutedEventArgs e)
+    {
+        string lnk;
+        try
+        {
+            lnk = Drawer.CreateShortcut(_config);
+        }
+        catch (Exception ex)
+        {
+            ShowMessage($"바로가기를 만들지 못했습니다.\n\n{ex.Message}", MessageBoxImage.Error);
+            return;
+        }
+        ShowMessage(Drawer.PinGuide, MessageBoxImage.Information);
+        Drawer.RevealInExplorer(lnk);
     }
 
     private void SetDropHighlight(int index, bool on) =>
@@ -711,7 +734,7 @@ public partial class BagWindow : Window
         SaveBag(_bag);
         SaveBag(target);
         RefreshSlot(fromIndex);
-        RefreshHint();
+        RefreshEmptyState();
     }
 
     private void Slot_MouseUp(object sender, MouseButtonEventArgs e)
@@ -846,7 +869,7 @@ public partial class BagWindow : Window
         }
 
         SaveBag(_bag);
-        RefreshHint();
+        RefreshEmptyState();
         if (skipped > 0)
             ShowMessage($"빈칸이 모자라 {skipped}개는 넣지 못했습니다.\n⚙ 설정에서 가방 크기를 늘릴 수 있습니다.", MessageBoxImage.Information);
     }
@@ -882,7 +905,7 @@ public partial class BagWindow : Window
         _bag.Slots.RemoveAll(s => s.Index == index);
         SaveBag(_bag);
         RefreshSlot(index);
-        RefreshHint();
+        RefreshEmptyState();
     }
 
     private void RevealSlot(int index)
@@ -922,7 +945,7 @@ public partial class BagWindow : Window
         if (result.ToRemoveKeys.Count > 0)
         {
             SaveBag(_bag);
-            RefreshHint();
+            RefreshEmptyState();
         }
 
         var free = _bag.Capacity - _bag.Slots.Count;

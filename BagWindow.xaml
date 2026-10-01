@@ -117,6 +117,45 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <!-- 빈 가방 안내 버튼, 알림 띠의 [고정하기] 같은 글자 버튼. 기본은 강조색, Subtle 쪽은 은은하게 -->
+        <Style x:Key="ActionButtonStyle" TargetType="Button">
+            <Setter Property="Padding" Value="12,5"/>
+            <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bg" Background="{DynamicResource AccentBrush}" CornerRadius="5" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bg" Property="Opacity" Value="0.85"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="SubtleActionButtonStyle" TargetType="Button" BasedOn="{StaticResource ActionButtonStyle}">
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bg" Background="{DynamicResource SlotHoverBrush}" CornerRadius="5" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bg" Property="Opacity" Value="0.7"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
 
     <Border x:Name="RootBorder" Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource PanelBorderBrush}"
@@ -135,10 +174,33 @@
                 </Button>
                 <StackPanel x:Name="TabPanel" Orientation="Horizontal" Margin="4,0,12,0"/>
             </DockPanel>
-            <TextBlock x:Name="HintText" DockPanel.Dock="Bottom" Margin="4,8,4,0" TextWrapping="Wrap"
-                       Foreground="{DynamicResource SubtleTextBrush}"
-                       Text="📌을 켜고 파일을 끌어다 놓으세요. 빈 곳을 우클릭하면 작업표시줄 앱을 가져올 수 있습니다."/>
-            <UniformGrid x:Name="SlotGrid" HorizontalAlignment="Center"/>
+            <!-- 알림 띠: 가방 아래에 쌓인다. 너비는 BuildGrid가 칸 너비에 맞춘다 -->
+            <StackPanel x:Name="NoticePanel" DockPanel.Dock="Bottom" HorizontalAlignment="Center">
+                <Border x:Name="PinNotice" Visibility="Collapsed" Margin="0,8,0,0" Padding="10,6,6,6"
+                        CornerRadius="6" Background="{DynamicResource SlotBrush}">
+                    <DockPanel>
+                        <Button DockPanel.Dock="Right" Style="{StaticResource GlyphButtonStyle}" VerticalAlignment="Center"
+                                ToolTip="다시 보지 않기" Click="DismissPinNotice_Click">
+                            <TextBlock Text="&#xE711;" FontFamily="{StaticResource IconFont}" FontSize="11"
+                                       Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                        </Button>
+                        <Button DockPanel.Dock="Right" Style="{StaticResource ActionButtonStyle}" Padding="10,3" Margin="6,0,2,0"
+                                VerticalAlignment="Center" Content="고정하기" Click="PinNotice_Click"/>
+                        <TextBlock Text="작업표시줄에 고정하면 한 번에 열려요" TextWrapping="Wrap" VerticalAlignment="Center"
+                                   Foreground="{DynamicResource TextBrush}"/>
+                    </DockPanel>
+                </Border>
+            </StackPanel>
+            <Grid>
+                <UniformGrid x:Name="SlotGrid" HorizontalAlignment="Center"/>
+                <!-- 아이템이 하나도 없는 가방의 안내. 배경이 없어서 버튼 밖은 빈칸이 파일 끌어놓기·우클릭을 그대로 받는다 -->
+                <StackPanel x:Name="EmptyPanel" Visibility="Collapsed" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <Button Style="{StaticResource ActionButtonStyle}" Content="작업표시줄 앱 가져오기" Click="EmptyImport_Click"/>
+                    <Button Style="{StaticResource SubtleActionButtonStyle}" Content="파일로 넣기" Margin="0,6,0,0" Click="EmptyAddFiles_Click"/>
+                    <TextBlock Text="파일을 끌어다 놓아도 돼요 (📌을 켜 두세요)" Margin="0,8,0,0" FontSize="11"
+                               HorizontalAlignment="Center" Foreground="{DynamicResource SubtleTextBrush}"/>
+                </StackPanel>
+            </Grid>
         </DockPanel>
     </Border>
 </Window>

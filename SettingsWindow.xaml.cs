@@ -416,11 +416,7 @@ public partial class SettingsWindow : Window
             return;
         }
 
-        ShowMessage("시작 메뉴에 TaskPack 바로가기를 만들었습니다.\n\n" +
-                    "확인을 누르면 탐색기가 열립니다.\n" +
-                    "TaskPack 바로가기를 우클릭 → '작업 표시줄에 고정'을 눌러 주세요.\n" +
-                    "(메뉴에 없으면 '더 많은 옵션 표시' 안에 있습니다. 시작 메뉴에서 TaskPack을 검색해 고정해도 됩니다.)",
-            MessageBoxImage.Information);
+        ShowMessage(Drawer.PinGuide, MessageBoxImage.Information);
         Drawer.RevealInExplorer(lnk);
     }
 
