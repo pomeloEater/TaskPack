@@ -425,8 +425,7 @@ public partial class SettingsWindow : Window
 
     private void RefreshVersion()
     {
-        var edition = UpdateCheck.Edition == "full" ? ".NET 포함판" : "가벼운 판";
-        CurrentVersionText.Text = $"현재 버전 {UpdateCheck.Current.ToString(3)} ({edition})";
+        CurrentVersionText.Text = $"현재 버전 {UpdateCheck.Current.ToString(3)}";
         AutoUpdateSwitch.IsChecked = _config.AutoUpdateCheck;
 
         var latest = UpdateCheck.ParseVersion(_config.LatestVersion);
