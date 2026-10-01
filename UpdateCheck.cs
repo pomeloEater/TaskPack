@@ -43,7 +43,7 @@ internal static class UpdateCheck
         latest > Current &&
         !string.Equals(config.SkippedVersion, config.LatestVersion, StringComparison.OrdinalIgnoreCase);
 
-    // 같은 판의 설치 파일 주소. -lite 파일은 가벼운 판, 그 밖의 .exe는 .NET 포함판. 못 찾으면 null
+    // 같은 판의 설치 파일 주소. -lite 파일은 lite, 그 밖의 .exe는 .NET 포함판. 못 찾으면 null
     public static string? PickAssetUrl(IEnumerable<(string Name, string Url)> assets, string edition)
     {
         var exes = assets.Where(a => a.Name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase)).ToList();

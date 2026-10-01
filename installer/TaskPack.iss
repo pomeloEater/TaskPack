@@ -4,7 +4,7 @@
 #ifndef AppVersion
   #define AppVersion "0.0.0"
 #endif
-; 두 가지 설치 파일: 기본은 .NET 포함판, /DLite=1 이면 .NET을 따로 설치해야 하는 가벼운 판 (build-installer.ps1 이 둘 다 만든다)
+; 두 가지 설치 파일: 기본은 .NET 포함판, /DLite=1 이면 .NET을 따로 설치해야 하는 lite (build-installer.ps1 이 둘 다 만든다)
 #ifdef Lite
   #define OutputSuffix "-lite"
   #define PublishDir "publish-lite"
@@ -52,7 +52,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 
 [InstallDelete]
 ; 판이 다른 설치 파일 위에 덮어 설치해도 실행 방식이 섞이지 않게, 이전 프로그램 파일을 먼저 지운다.
-; (.NET 포함판의 런타임 DLL이 가벼운 판 설치 폴더에 남는 것을 막는다. 가방 데이터는 %APPDATA%에 있어 영향 없음)
+; (.NET 포함판의 런타임 DLL이 lite 설치 폴더에 남는 것을 막는다. 가방 데이터는 %APPDATA%에 있어 영향 없음)
 ; TaskPack.exe가 있는 폴더일 때만 지우며, 제거 프로그램(unins*)은 건드리지 않는다
 Type: files; Name: "{app}\*.dll"; Check: IsExistingInstall
 Type: files; Name: "{app}\*.json"; Check: IsExistingInstall

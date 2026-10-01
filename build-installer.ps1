@@ -1,6 +1,6 @@
 ﻿# 배포용 설치 파일 두 종류를 만든다 (installer\Output 아래).
 #   TaskPack-Setup-<버전>.exe       .NET 포함판 (기본)
-#   TaskPack-Setup-<버전>-lite.exe  가벼운 판 (.NET 8 데스크톱 런타임을 따로 설치해야 함)
+#   TaskPack-Setup-<버전>-lite.exe  lite (.NET 8 데스크톱 런타임을 따로 설치해야 함)
 # 필요한 것: .NET 8 SDK, Inno Setup 6 (winget install JRSoftware.InnoSetup)
 # 버전은 TaskPack.csproj 의 <Version> 을 따른다.
 $ErrorActionPreference = 'Stop'
@@ -12,7 +12,7 @@ $installer = Join-Path $root 'installer'
 $version = @($proj.Project.PropertyGroup | ForEach-Object { $_.Version } | Where-Object { $_ })[0]
 if (-not $version) { throw 'TaskPack.csproj 에 <Version> 이 없습니다.' }
 
-# 2. 배포용 빌드 두 가지: .NET 포함판(publish), 가벼운 판(publish-lite)
+# 2. 배포용 빌드 두 가지: .NET 포함판(publish), lite(publish-lite)
 $publish = Join-Path $installer 'publish'
 $publishLite = Join-Path $installer 'publish-lite'
 foreach ($dir in $publish, $publishLite) {
