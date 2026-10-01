@@ -108,12 +108,12 @@ begin
 end;
 
 #ifdef Lite
-// .NET 10 데스크톱 런타임(x64)이 설치되어 있는지: dotnet\shared\Microsoft.WindowsDesktop.App.* 폴더로 판단
+// .NET 10 데스크톱 런타임(x64)이 설치되어 있는지: dotnet\shared\Microsoft.WindowsDesktop.App\10.* 폴더로 판단
 function HasDesktopRuntime10(const DotNetDir: String): Boolean;
 var
   FindRec: TFindRec;
 begin
-  Result := FindFirst(DotNetDir + '\shared\Microsoft.WindowsDesktop.App.*', FindRec);
+  Result := FindFirst(DotNetDir + '\shared\Microsoft.WindowsDesktop.App\10.*', FindRec);
   if Result then
     FindClose(FindRec);
 end;
