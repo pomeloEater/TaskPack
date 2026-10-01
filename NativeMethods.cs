@@ -95,6 +95,16 @@ internal static class NativeMethods
     [DllImport("shell32.dll", CharSet = CharSet.Unicode)]
     public static extern int SetCurrentProcessExplicitAppUserModelID(string appId);
 
+    // 상주 중인 TaskPack이 앞으로 나와도 된다고 허락한다 (pid로 -1이면 모든 프로세스)
+    public const int ASFW_ANY = -1;
+
+    [DllImport("user32.dll")]
+    public static extern bool AllowSetForegroundWindow(int processId);
+
+    // 작업 집합(실제로 잡고 있는 메모리)을 줄이도록 Windows에 요청한다. 둘 다 -1이면 가능한 만큼 비운다
+    [DllImport("kernel32.dll")]
+    public static extern bool SetProcessWorkingSetSize(IntPtr process, IntPtr minimum, IntPtr maximum);
+
     public const int DWMWA_USE_IMMERSIVE_DARK_MODE = 20;
 
     [DllImport("dwmapi.dll")]

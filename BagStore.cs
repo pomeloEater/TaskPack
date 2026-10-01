@@ -52,6 +52,7 @@ public sealed class DrawerConfig
     public string? LatestVersion { get; set; }       // 마지막으로 확인한 최신 버전
     public string? LatestUrl { get; set; }           // 그 버전의 같은 판 설치 파일 주소 (없으면 릴리스 페이지)
     public string? SkippedVersion { get; set; }      // ×로 건너뛴 버전. 다음 버전이 나오면 다시 알린다
+    public bool HoverOpen { get; set; }              // 작업표시줄 아이콘에 마우스를 올리면 가방 열기. 켜면 TaskPack이 뒤에서 계속 켜져 있다
 }
 
 // %APPDATA%\TaskPack 아래의 설정과 가방을 읽고 쓴다

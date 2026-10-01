@@ -15,8 +15,6 @@ namespace TaskPack;
 
 public partial class BagWindow : Window
 {
-    public const string SignalName = @"Local\TaskPack.Drawer";
-
     private const string SlotDataFormat = "TaskPack.Slot";   // 값: "<가방 id>|<칸 번호>"
     private const string TabDataFormat = "TaskPack.Tab";     // 값: 가방 id
     private const double SlotOuterWidth = 84;   // 칸 너비 80 + 좌우 여백 2씩
@@ -65,7 +63,7 @@ public partial class BagWindow : Window
         _bag = bags.Find(b => b.Id == config.LastTab) ?? bags[0];
 
         // 다른 TaskPack 프로세스가 신호를 보내면(작업표시줄 아이콘 재클릭) 닫는다
-        _signal = new EventWaitHandle(false, EventResetMode.AutoReset, SignalName);
+        _signal = new EventWaitHandle(false, EventResetMode.AutoReset, Signals.Drawer);
         _signalWait = ThreadPool.RegisterWaitForSingleObject(_signal,
             (_, _) => Dispatcher.InvokeAsync(CloseBag), null, Timeout.Infinite, executeOnlyOnce: true);
 
