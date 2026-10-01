@@ -114,7 +114,7 @@ public partial class BagWindow : Window
         Deactivated += OnDeactivated;
         // 작업표시줄에서 최소화되면(작업표시줄 아이콘 클릭, Win+D 등) 닫는다
         StateChanged += (_, _) => { if (WindowState == WindowState.Minimized) CloseBag(); };
-        KeyDown += (_, e) => { if (e.Key == Key.Escape) CloseBag(); };
+        PreviewKeyDown += OnWindowKeyDown; // 버튼이 포커스를 가진 채여도 Enter·Space가 칸 실행으로 가도록 먼저 받는다
         Closed += (_, _) =>
         {
             _closed = true;
@@ -622,6 +622,7 @@ public partial class BagWindow : Window
 
     private void BuildGrid()
     {
+        _keyIndex = -1;
         SlotGrid.Children.Clear();
         SlotGrid.Columns = _bag.Columns;
         SlotGrid.Rows = _bag.Rows;
@@ -899,6 +900,77 @@ public partial class BagWindow : Window
         var p = e.GetPosition(cell);
         if (wasPressed && p.X >= 0 && p.Y >= 0 && p.X < cell.ActualWidth && p.Y < cell.ActualHeight)
             Launch(index);
+    }
+
+    // ───────────── 키보드 ─────────────
+
+    private int _keyIndex = -1;   // 키보드로 고른 칸 (없으면 -1)
+
+    // Esc: 닫기. Tab·Shift+Tab: 아이템이 있는 칸끼리 옮기기. 방향키: 격자를 따라 옮기기. Enter·Space: 고른 칸 실행.
+    // 마우스를 올려 연 가방은 안을 한 번 눌러 활성화된 뒤부터 키보드를 받는다
+    private void OnWindowKeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Escape)
+        {
+            CloseBag();
+            return;
+        }
+        if (_editingBag is not null || Keyboard.FocusedElement is TextBox)
+            return; // 탭 이름을 고치는 중에는 입력칸이 키를 받는다
+
+        switch (e.Key)
+        {
+            case Key.Tab:
+                MoveKeySelectionToItem((Keyboard.Modifiers & ModifierKeys.Shift) != 0 ? -1 : 1);
+                break;
+            case Key.Left: MoveKeySelectionOnGrid(0, -1); break;
+            case Key.Right: MoveKeySelectionOnGrid(0, 1); break;
+            case Key.Up: MoveKeySelectionOnGrid(-1, 0); break;
+            case Key.Down: MoveKeySelectionOnGrid(1, 0); break;
+            case Key.Enter:
+            case Key.Space:
+                if (_keyIndex >= 0)
+                    Launch(_keyIndex);
+                break;
+            default:
+                return;
+        }
+        e.Handled = true;
+    }
+
+    private void SetKeySelection(int index)
+    {
+        if (_keyIndex >= 0 && _keyIndex < _slots.Length)
+            SetDropHighlight(_keyIndex, false);
+        _keyIndex = index;
+        if (index >= 0)
+            SetDropHighlight(index, true);
+    }
+
+    // 아이템이 있는 다음(direction=1)·이전(-1) 칸으로. 끝에서는 반대쪽 끝으로 돌아온다
+    private void MoveKeySelectionToItem(int direction)
+    {
+        var filled = Enumerable.Range(0, _slots.Length).Where(i => _bag.Find(i) is not null).ToList();
+        if (filled.Count == 0)
+            return;
+        var at = filled.IndexOf(_keyIndex);
+        var next = at < 0
+            ? (direction > 0 ? 0 : filled.Count - 1)
+            : (at + direction + filled.Count) % filled.Count;
+        SetKeySelection(filled[next]);
+    }
+
+    // 격자를 따라 한 칸 옮긴다 (빈칸 포함, 가장자리에서 멈춤). 아직 고른 칸이 없으면 첫 아이템을 고른다
+    private void MoveKeySelectionOnGrid(int dRow, int dCol)
+    {
+        if (_keyIndex < 0)
+        {
+            MoveKeySelectionToItem(1);
+            return;
+        }
+        var row = Math.Clamp(_keyIndex / _bag.Columns + dRow, 0, _bag.Rows - 1);
+        var col = Math.Clamp(_keyIndex % _bag.Columns + dCol, 0, _bag.Columns - 1);
+        SetKeySelection(row * _bag.Columns + col);
     }
 
     private void Launch(int index)
