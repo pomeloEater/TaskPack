@@ -293,10 +293,12 @@ public partial class BagWindow : Window
         var info = new MONITORINFO { cbSize = System.Runtime.InteropServices.Marshal.SizeOf<MONITORINFO>() };
         if (!GetMonitorInfo(MonitorFromPoint(_anchor, MONITOR_DEFAULTTONEAREST), ref info))
             return;
-        GetWindowRect(hwnd, out var rect);
 
-        int w = rect.Right - rect.Left, h = rect.Bottom - rect.Top;
-        int gap = (int)Math.Round(ScreenGap * VisualTreeHelper.GetDpi(this).DpiScaleX);
+        // 창 크기는 윈도우 사각형이 아니라 화면 배치가 끝난 크기(ActualWidth·ActualHeight)로 잰다.
+        // 알림 띠를 닫아 크기가 줄어드는 순간에는 윈도우 사각형이 아직 옛 크기라 가방이 허공에 뜬다
+        var dpi = VisualTreeHelper.GetDpi(this);
+        int w = (int)Math.Round(ActualWidth * dpi.DpiScaleX), h = (int)Math.Round(ActualHeight * dpi.DpiScaleY);
+        int gap = (int)Math.Round(ScreenGap * dpi.DpiScaleX);
         var work = info.rcWork;
         var full = info.rcMonitor;
         var cursor = _anchor;
