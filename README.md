@@ -1,10 +1,40 @@
-# TaskPack
+<p align="center">
+  <img src="site/icon.png" alt="TaskPack 아이콘" width="112">
+</p>
 
-작업표시줄에 고정하는 가방입니다. 작업표시줄의 가방 아이콘을 누르면 마비노기 가방처럼 칸이 있는 창이 작업표시줄 옆에 펼쳐지고, 칸을 한 번 누르면 프로그램이 실행됩니다. 가방은 탭으로 여러 개 만들 수 있습니다.
+<h1 align="center">TaskPack</h1>
 
-- 홈페이지: https://taskpack.vercel.app
-- 내려받기: [최신 릴리스](https://github.com/pomeloEater/TaskPack/releases/latest)
-- 설계 문서: [spec/plan.md](spec/plan.md)
+<p align="center">
+  <b>작업표시줄에 가방 하나.</b><br>
+  누르면 펼쳐지는 Windows 작업표시줄 가방 · <i>아버지가방에들어가신다</i>
+</p>
+
+<p align="center">
+  <a href="https://github.com/pomeloEater/TaskPack/releases/latest"><img src="https://img.shields.io/github/v/release/pomeloEater/TaskPack?label=%EC%B5%9C%EC%8B%A0%20%EB%B2%84%EC%A0%84&color=0F9A87" alt="최신 버전"></a>
+  <a href="https://github.com/pomeloEater/TaskPack/releases"><img src="https://img.shields.io/github/downloads/pomeloEater/TaskPack/total?label=%EB%82%B4%EB%A0%A4%EB%B0%9B%EA%B8%B0&color=B5541A" alt="내려받기 수"></a>
+  <img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4" alt="Windows 10 | 11">
+  <img src="https://img.shields.io/badge/.NET-8-512BD4" alt=".NET 8">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-1C1A17" alt="MIT License"></a>
+</p>
+
+<p align="center">
+  <a href="https://taskpack.vercel.app"><b>🏠 홈페이지</b></a> &nbsp;·&nbsp;
+  <a href="https://github.com/pomeloEater/TaskPack/releases/latest"><b>⬇️ 내려받기</b></a> &nbsp;·&nbsp;
+  <a href="#3-사용법"><b>🎒 사용법</b></a> &nbsp;·&nbsp;
+  <a href="spec/plan.md"><b>📐 설계 문서</b></a>
+</p>
+
+<p align="center">
+  <img src="promo/out/taskpack-og.png" alt="작업표시줄에 가방 하나 — TaskPack 미리보기" width="820">
+</p>
+
+작업표시줄의 가방 아이콘을 누르면 **마비노기 가방처럼 칸이 있는 창**이 작업표시줄 옆에 펼쳐지고, 칸을 한 번 누르면 프로그램이 실행됩니다. 가방은 탭으로 여러 개 만들 수 있어요. 바탕화면과 작업표시줄은 비우고, 자주 쓰는 프로그램은 가방에서 꺼내 쓰세요.
+
+## 특징
+
+| 🗂️ 탭으로 여러 가방 | 🖱️ 끌어서 넣기 | 🎨 가방마다 다른 색 | 📍 작업표시줄 옆에 착 | 💾 zip 하나로 백업 |
+|---|---|---|---|---|
+| 작업용·게임용·공부용, 이름과 순서도 자유롭게 | 파일·폴더·바로가기·Windows 앱. 작업표시줄 앱은 체크만 | 시스템·라이트·다크·커스텀 색 | 가로 작업표시줄은 위로, 세로는 옆으로 | 새 PC에서도 가방 그대로 |
 
 ## 1. 설치
 
