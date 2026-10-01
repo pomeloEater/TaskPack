@@ -40,6 +40,8 @@ public partial class BagWindow : Window
 
     private readonly EventWaitHandle _signal;
     private readonly RegisteredWaitHandle _signalWait;
+    private RECT? _hoverButton;                        // 마우스를 올려 연 가방이면 그때 아이콘 영역. 안을 누르거나 아이콘을 누르면 일반 가방이 되어 null
+    private DispatcherTimer? _leaveTimer;
     private readonly POINT _anchor;                     // 처음 연 마우스 위치. 창 크기가 바뀌어도 이 기준으로 다시 배치
 
     private bool _placed;
@@ -54,18 +56,28 @@ public partial class BagWindow : Window
     private int _menuSlot;           // 가방 메뉴를 연 칸 ("파일로 넣기"를 채우기 시작할 칸)
     private Point _pressPoint;
 
-    public BagWindow(DrawerConfig config, List<Bag> bags)
+    // hoverButton: 마우스를 올려서 연 경우, 그때 TaskPack 아이콘이 있던 영역(물리 픽셀). 이 경우 포커스를 가져오지 않고, 마우스가 떠나면 닫는다
+    internal BagWindow(DrawerConfig config, List<Bag> bags, RECT? hoverButton = null)
     {
         InitializeComponent();
+        _hoverButton = hoverButton;
+        ShowActivated = hoverButton is null;
+        if (hoverButton is not null)
+        {
+            // 마우스만 올린 상태에서 키보드 입력을 가로채지 않게, 안을 누르기 전까지는 활성화되지 않는 창으로 둔다
+            // (ShowActivated만으로는 배율이 다른 모니터로 옮겨질 때 활성화되는 것을 막지 못했다)
+            SourceInitialized += (_, _) => SetNoActivate(true);
+            PreviewMouseDown += (_, _) => { if (_hoverButton is not null) PromoteToNormal(); };
+        }
         GetCursorPos(out _anchor);
         _config = config;
         _bags = bags;
         _bag = bags.Find(b => b.Id == config.LastTab) ?? bags[0];
 
-        // 다른 TaskPack 프로세스가 신호를 보내면(작업표시줄 아이콘 재클릭) 닫는다
+        // 다른 TaskPack 프로세스가 신호를 보내면(작업표시줄 아이콘 재클릭) 닫는다. 마우스를 올려 막 연 가방이면 닫지 않고 일반 가방으로 바꾼다
         _signal = new EventWaitHandle(false, EventResetMode.AutoReset, Signals.Drawer);
         _signalWait = ThreadPool.RegisterWaitForSingleObject(_signal,
-            (_, _) => Dispatcher.InvokeAsync(CloseBag), null, Timeout.Infinite, executeOnlyOnce: true);
+            (_, _) => Dispatcher.InvokeAsync(OnReclickSignal), null, Timeout.Infinite, executeOnlyOnce: false);
 
         RootBorder.ContextMenu = new ContextMenu
         {
@@ -93,7 +105,7 @@ public partial class BagWindow : Window
             _placed = true;
             PlaceNearTaskbar();
             AnimateIn();
-            Activate();
+            if (_hoverButton is null) Activate(); else StartLeaveWatch();
             _ = CheckForUpdateAsync();
         };
         // 탭을 바꿔 크기가 달라지거나, 다른 배율의 모니터로 옮겨지면 다시 배치
@@ -130,6 +142,69 @@ public partial class BagWindow : Window
             if (!_closed) Close();
         };
         timer.Start();
+    }
+
+    // 작업표시줄 아이콘을 다시 눌렀다. 마우스를 올려 막 열린 가방이면 닫지 않고 일반 가방으로 바꾼다
+    // (올리면 열리는 것을 보고 누른 사람이 곧바로 닫아 버리지 않게 한다)
+    private void OnReclickSignal()
+    {
+        if (_hoverButton is not null && !_closing)
+            PromoteToNormal();
+        else
+            CloseBag();
+    }
+
+    private void PromoteToNormal()
+    {
+        _leaveTimer?.Stop();
+        _hoverButton = null;
+        SetNoActivate(false);
+        if (!IsForeground()) Activate();
+    }
+
+    // 이 창이 실제로 키보드 입력을 받는 앞 창인지. 배율이 다른 모니터에 띄울 때 WPF의 IsActive는 실제와 다를 수 있다
+    private bool IsForeground() => GetForegroundWindow() == new WindowInteropHelper(this).Handle;
+
+    private void SetNoActivate(bool on)
+    {
+        var hwnd = new WindowInteropHelper(this).Handle;
+        if (hwnd == IntPtr.Zero) return;
+        var style = GetWindowLongPtr(hwnd, GWL_EXSTYLE).ToInt64();
+        style = on ? style | WS_EX_NOACTIVATE : style & ~WS_EX_NOACTIVATE;
+        SetWindowLongPtr(hwnd, GWL_EXSTYLE, new IntPtr(style));
+    }
+
+    // 마우스를 올려 연 가방: 가방과 아이콘(둘 사이 포함) 밖으로 나간 채 0.5초가 지나면 닫는다.
+    // 안을 눌러 활성화되면 그때부터는 일반 가방과 같다(바깥을 누르면 닫힘)
+    private static readonly TimeSpan HoverLeaveDelay = TimeSpan.FromMilliseconds(500);
+
+    private void StartLeaveWatch()
+    {
+        var outside = Stopwatch.StartNew();
+        var wasOutside = false;
+        _leaveTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(100) };
+        _leaveTimer.Tick += (_, _) =>
+        {
+            if (_closing || _closed) { _leaveTimer?.Stop(); return; }
+            if (IsForeground()) { PromoteToNormal(); return; }
+            if (_modalDepth > 0 || PinButton.IsChecked == true || IsCursorInHoverArea())
+            {
+                wasOutside = false;
+                return;
+            }
+            if (!wasOutside) { wasOutside = true; outside.Restart(); }
+            else if (outside.Elapsed >= HoverLeaveDelay) { _leaveTimer?.Stop(); CloseBag(); }
+        };
+        _leaveTimer.Start();
+    }
+
+    // 가방 영역, 아이콘 영역, 그 둘을 감싸는 영역(사이 빈틈 포함) 안에 커서가 있는지
+    private bool IsCursorInHoverArea()
+    {
+        if (_hoverButton is not { } button || !GetCursorPos(out var p) || !GetWindowRect(new WindowInteropHelper(this).Handle, out var bag))
+            return true; // 알 수 없으면 닫지 않는다
+        return p.X >= Math.Min(bag.Left, button.Left) && p.X < Math.Max(bag.Right, button.Right)
+            && p.Y >= Math.Min(bag.Top, button.Top) && p.Y < Math.Max(bag.Bottom, button.Bottom);
     }
 
     private void CloseBag()
@@ -626,6 +701,36 @@ public partial class BagWindow : Window
         if (update)
             UpdateNoticeText.Text = $"새 버전 {UpdateCheck.ParseVersion(_config.LatestVersion)}이 나왔어요";
         PinNotice.Visibility = !_config.HidePinNotice && !Drawer.IsPinned() ? Visibility.Visible : Visibility.Collapsed;
+        HoverNotice.Visibility = Visibility.Collapsed;
+        if (!_config.HoverOpen && !_config.HoverIntroDismissed)
+            _ = ShowHoverNoticeIfSupportedAsync();
+    }
+
+    // 마우스오버가 이 PC에서 동작할 때만(작업표시줄에서 TaskPack 아이콘을 찾을 수 있을 때만) 소개 띠를 보인다
+    private async Task ShowHoverNoticeIfSupportedAsync()
+    {
+        var supported = await Task.Run(HoverMonitor.IsSupported);
+        if (_closed || !supported || _config.HoverOpen || _config.HoverIntroDismissed)
+            return;
+        HoverNoticeText.Text = "새 기능: 작업표시줄 아이콘에 마우스를 올리면 열려요";
+        HoverNoticeButton.Visibility = Visibility.Visible;
+        HoverNotice.Visibility = Visibility.Visible;
+    }
+
+    // 켜기: 설정을 켜고 저장한다. 이 가방을 닫으면 TaskPack이 상주하기 시작한다
+    private void HoverNotice_Click(object sender, RoutedEventArgs e)
+    {
+        HoverSetting.Apply(_config, true);
+        SaveConfig();
+        HoverNoticeText.Text = "켰어요. 가방을 닫으면 시계 옆에 아이콘이 생기고, 작업표시줄 아이콘에 마우스를 올리면 열려요";
+        HoverNoticeButton.Visibility = Visibility.Collapsed;
+    }
+
+    private void DismissHoverNotice_Click(object sender, RoutedEventArgs e)
+    {
+        _config.HoverIntroDismissed = true;
+        SaveConfig();
+        HoverNotice.Visibility = Visibility.Collapsed;
     }
 
     // 마지막 확인 뒤 24시간이 지났으면 뒤에서 조회한다. 실패하면 조용히 넘어가고 다음에 다시 시도한다

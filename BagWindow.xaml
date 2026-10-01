@@ -190,6 +190,20 @@
                                    Foreground="{DynamicResource TextBrush}"/>
                     </DockPanel>
                 </Border>
+                <Border x:Name="HoverNotice" Visibility="Collapsed" Margin="0,8,0,0" Padding="10,6,6,6"
+                        CornerRadius="6" Background="{DynamicResource SlotBrush}">
+                    <DockPanel>
+                        <Button DockPanel.Dock="Right" Style="{StaticResource GlyphButtonStyle}" VerticalAlignment="Center"
+                                ToolTip="다시 보지 않기" Click="DismissHoverNotice_Click">
+                            <TextBlock Text="&#xE711;" FontFamily="{StaticResource IconFont}" FontSize="11"
+                                       Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                        </Button>
+                        <Button x:Name="HoverNoticeButton" DockPanel.Dock="Right" Style="{StaticResource ActionButtonStyle}" Padding="10,3" Margin="6,0,2,0"
+                                VerticalAlignment="Center" Content="켜기" Click="HoverNotice_Click"/>
+                        <TextBlock x:Name="HoverNoticeText" Text="새 기능: 작업표시줄 아이콘에 마우스를 올리면 열려요" TextWrapping="Wrap" VerticalAlignment="Center"
+                                   Foreground="{DynamicResource TextBrush}"/>
+                    </DockPanel>
+                </Border>
                 <Border x:Name="PinNotice" Visibility="Collapsed" Margin="0,8,0,0" Padding="10,6,6,6"
                         CornerRadius="6" Background="{DynamicResource SlotBrush}">
                     <DockPanel>

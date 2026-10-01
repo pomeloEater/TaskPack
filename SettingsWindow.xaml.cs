@@ -29,6 +29,7 @@ public partial class SettingsWindow : Window
         BuildBagList(_bags.FirstOrDefault());
         RefreshDrawer();
         RefreshVersion();
+        RefreshHover();
         // 탐색기에서 고정하고 돌아오면 고정 여부를 다시 확인한다
         Activated += (_, _) => RefreshDrawer();
     }
@@ -479,6 +480,45 @@ public partial class SettingsWindow : Window
 
         ShowMessage(Drawer.PinGuide, MessageBoxImage.Information);
         Drawer.RevealInExplorer(lnk);
+    }
+
+    // ───────────── 마우스를 올리면 열기 ─────────────
+
+    private void RefreshHover()
+    {
+        HoverSwitch.IsChecked = _config.HoverOpen;
+        RefreshAutostart();
+        // 이 PC에서 TaskPack 아이콘을 찾을 수 있는지는 뒤에서 확인한다 (작업표시줄을 읽는 데 시간이 걸릴 수 있다)
+        _ = ShowIfHoverUnsupportedAsync();
+    }
+
+    private async Task ShowIfHoverUnsupportedAsync()
+    {
+        var supported = await Task.Run(HoverMonitor.IsSupported);
+        HoverUnsupportedText.Visibility = supported ? Visibility.Collapsed : Visibility.Visible;
+    }
+
+    private void RefreshAutostart()
+    {
+        var state = Autostart.GetState();
+        AutostartSwitch.IsChecked = state == AutostartState.On;
+        AutostartNote.Text = "Windows 설정이나 작업 관리자의 \"시작 앱\"에서 꺼져 있습니다. 스위치를 켜면 다시 켭니다.";
+        AutostartNote.Visibility = state == AutostartState.DisabledInTaskManager ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    // 켜면 Windows를 시작할 때도 켜 두고, 끄면 그 항목도 지운다. 시작할 때 켜는 것은 아래 스위치로 따로 끌 수 있다
+    private void Hover_Click(object sender, RoutedEventArgs e)
+    {
+        HoverSetting.Apply(_config, HoverSwitch.IsChecked == true);
+        SaveConfig();
+        RefreshAutostart();
+    }
+
+    private void Autostart_Click(object sender, RoutedEventArgs e)
+    {
+        if (!Autostart.TrySet(AutostartSwitch.IsChecked == true))
+            ShowMessage("시작 프로그램 목록을 바꾸지 못했습니다.", MessageBoxImage.Error);
+        RefreshAutostart();
     }
 
     // ───────────── 버전 ─────────────

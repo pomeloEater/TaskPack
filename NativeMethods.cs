@@ -99,6 +99,25 @@ internal static class NativeMethods
     public const int ASFW_ANY = -1;
 
     [DllImport("user32.dll")]
+    public static extern IntPtr GetForegroundWindow();
+
+    // 창이 활성화(키보드 입력을 받는 앞 창이 되는 것)되지 않게 하는 확장 스타일
+    public const int GWL_EXSTYLE = -20;
+    public const long WS_EX_NOACTIVATE = 0x08000000L;
+
+    [DllImport("user32.dll", EntryPoint = "GetWindowLongPtrW")]
+    public static extern IntPtr GetWindowLongPtr(IntPtr hWnd, int index);
+
+    [DllImport("user32.dll", EntryPoint = "SetWindowLongPtrW")]
+    public static extern IntPtr SetWindowLongPtr(IntPtr hWnd, int index, IntPtr newLong);
+
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+    public static extern IntPtr FindWindow(string? className, string? windowName);
+
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+    public static extern IntPtr FindWindowEx(IntPtr parent, IntPtr childAfter, string? className, string? windowName);
+
+    [DllImport("user32.dll")]
     public static extern bool AllowSetForegroundWindow(int processId);
 
     // 작업 집합(실제로 잡고 있는 메모리)을 줄이도록 Windows에 요청한다. 둘 다 -1이면 가능한 만큼 비운다
