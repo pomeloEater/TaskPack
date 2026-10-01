@@ -21,6 +21,12 @@
   #define TestSuffix ""
 #endif
 #define AppName "TaskPack"
+; 제거할 때 지우는 시작 프로그램 값 이름 (프로그램의 Autostart.cs와 같아야 한다. 시험용은 "TaskPack (시험)")
+#ifdef TestBuild
+  #define AutostartValue "TaskPack (시험)"
+#else
+  #define AutostartValue "TaskPack"
+#endif
 #define AppExe "TaskPack.exe"
 ; 작업표시줄에서 TaskPack 아이콘 아래에 "실행 중"으로 묶이려면 바로가기와 프로그램이 같은 식별자를 써야 한다 (Drawer.AppId)
 #define AppUserModelId "TaskPack.Drawer"
@@ -116,13 +122,16 @@ english.DeleteData=Also delete your bags (tabs, items, icons, pre-restore copies
 var
   TaskPackWasRunning: Boolean;
 
-// 실행 중인 TaskPack을 끝낸다. 마우스를 올리면 열기를 켠 TaskPack은 창 없이 뒤에서 켜져 있어서 닫기 요청을 받지 못한다.
-// 끝냈으면 true (실행 중이던 것이 없으면 taskkill이 0이 아닌 값을 돌려준다)
+// 설치 폴더({app})에서 실행 중인 TaskPack을 끝낸다. 마우스를 올리면 열기를 켠 TaskPack은 창 없이 뒤에서 켜져 있어서 닫기 요청을 받지 못한다.
+// 다른 폴더에서 실행 중인 TaskPack(시험 중인 것 등)은 건드리지 않도록 이름이 아니라 실행 파일 경로로 고른다.
+// 끝낸 것이 있으면 true
 function StopTaskPack: Boolean;
 var
   ResultCode: Integer;
+  Command: String;
 begin
-  Result := Exec(ExpandConstant('{sys}\taskkill.exe'), '/F /IM {#AppExe}', '', SW_HIDE, ewWaitUntilTerminated, ResultCode) and (ResultCode = 0);
+  Command := '-NoProfile -ExecutionPolicy Bypass -Command "$p = @(Get-Process TaskPack -ErrorAction SilentlyContinue | Where-Object { $_.Path -like ''' + ExpandConstant('{app}') + '\*'' }); if ($p.Count -gt 0) { $p | Stop-Process -Force; exit 0 } else { exit 3 }"';
+  Result := Exec(ExpandConstant('{sys}\WindowsPowerShell\v1.0\powershell.exe'), Command, '', SW_HIDE, ewWaitUntilTerminated, ResultCode) and (ResultCode = 0);
 end;
 
 // 설치 파일을 복사하기 전에 실행 중인 TaskPack을 끝낸다
@@ -197,8 +206,8 @@ begin
   // Windows를 시작할 때 켜 두는 항목(내 계정의 시작 프로그램)을 지운다
   if CurUninstallStep = usUninstall then
   begin
-    RegDeleteValue(HKCU, 'Software\Microsoft\Windows\CurrentVersion\Run', '{#AppName}');
-    RegDeleteValue(HKCU, 'Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run', '{#AppName}');
+    RegDeleteValue(HKCU, 'Software\Microsoft\Windows\CurrentVersion\Run', '{#AutostartValue}');
+    RegDeleteValue(HKCU, 'Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run', '{#AutostartValue}');
   end;
   if CurUninstallStep = usPostUninstall then
   begin
