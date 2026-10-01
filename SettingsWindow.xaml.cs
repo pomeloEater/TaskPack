@@ -24,6 +24,7 @@ public partial class SettingsWindow : Window
         ScreenHelper.KeepInsideWorkArea(this);
 
         AppIconImage.Source = ShellIcons.Get(Drawer.ExePath);
+        BuildEmojiPicker();
         BuildGlobalModes();
         BuildBagList(_bags.FirstOrDefault());
         RefreshDrawer();
@@ -232,13 +233,20 @@ public partial class SettingsWindow : Window
         RowsText.Text = bag.Rows.ToString();
 
         // 탭 아이콘
-        var icon = TabIconOf(bag);
-        TabIconImage.Source = icon;
-        TabIconButton.Content = icon is null ? "아이콘 추가…" : "아이콘 변경…";
-        TabIconRemoveButton.Visibility = bag.TabIcon is null ? Visibility.Collapsed : Visibility.Visible;
-        HideNameSwitch.IsEnabled = icon is not null;
-        HideNameSwitch.IsChecked = bag.HideName && icon is not null;
-        HideNameSwitch.ToolTip = icon is null ? "탭 아이콘을 넣어야 이름을 숨길 수 있습니다" : null;
+        var hasIcon = bag.TabEmoji is not null || TabIconOf(bag) is not null;
+        TabIconPreview.Child = TabEmoji.CreateVisual(bag.TabEmoji, 28) ?? (TabIconOf(bag) is { } file
+            ? new Image { Source = file, Width = 28, Height = 28 }
+            : null);
+        if (TabIconPreview.Child is Image previewImage)
+            RenderOptions.SetBitmapScalingMode(previewImage, BitmapScalingMode.HighQuality);
+        var chosen = TabEmoji.Find(bag.TabEmoji)?.Slug;
+        foreach (var (slug, cell) in _emojiCells)
+            cell.BorderBrush = slug == chosen ? (Brush)FindResource("AccentBrush") : Brushes.Transparent;
+        EmojiInput.Text = bag.TabEmoji is not null && chosen is null ? bag.TabEmoji : "";
+        TabIconRemoveButton.Visibility = hasIcon ? Visibility.Visible : Visibility.Collapsed;
+        HideNameSwitch.IsEnabled = hasIcon;
+        HideNameSwitch.IsChecked = bag.HideName && hasIcon;
+        HideNameSwitch.ToolTip = hasIcon ? null : "탭 아이콘을 넣어야 이름을 숨길 수 있습니다";
 
         _building = false;
     }
@@ -321,6 +329,7 @@ public partial class SettingsWindow : Window
             var dir = BagStore.BagDir(bag.Id);
             var old = bag.TabIcon is { } stored ? BagStore.Resolve(bag, stored) : null;
             bag.TabIcon = BagStore.ToStored(bag, IconFile.Import(dialog.FileName, dir, "tab-icon"));
+            bag.TabEmoji = null; // 그림 파일과 이모티콘은 둘 중 하나만 쓴다
             Save(bag);
             if (old is not null && old != BagStore.Resolve(bag, bag.TabIcon))
                 IconFile.DeleteImported(old, dir);
@@ -339,9 +348,60 @@ public partial class SettingsWindow : Window
         if (bag.TabIcon is { } stored)
             IconFile.DeleteImported(BagStore.Resolve(bag, stored), BagStore.BagDir(bag.Id));
         bag.TabIcon = null;
+        bag.TabEmoji = null;
         bag.HideName = false;
         Save(bag);
         RefreshSelected();
+    }
+
+    // ───────────── 탭 이모티콘 ─────────────
+
+    private readonly Dictionary<string, Border> _emojiCells = new();
+
+    // 이모티콘 목록을 한 번 만든다. 선택 표시는 RefreshSelected가 바꾼다
+    private void BuildEmojiPicker()
+    {
+        foreach (var entry in TabEmoji.Catalog)
+        {
+            var cell = new Border
+            {
+                Width = 38, Height = 38, Margin = new Thickness(0, 0, 4, 4), CornerRadius = new CornerRadius(8),
+                BorderThickness = new Thickness(2), BorderBrush = Brushes.Transparent, Background = Brushes.Transparent,
+                Cursor = System.Windows.Input.Cursors.Hand, ToolTip = entry.Name,
+                Child = TabEmoji.CreateVisual(entry.Emoji, 26),
+            };
+            cell.MouseEnter += (_, _) => cell.Background = (Brush)FindResource("SlotHoverBrush");
+            cell.MouseLeave += (_, _) => cell.Background = Brushes.Transparent;
+            cell.MouseLeftButtonUp += (_, _) => SetEmoji(entry.Emoji);
+            _emojiCells[entry.Slug] = cell;
+            EmojiPanel.Children.Add(cell);
+        }
+    }
+
+    private void SetEmoji(string emoji)
+    {
+        if (_selected is not { } bag)
+            return;
+        if (bag.TabIcon is { } stored) // 이모티콘을 고르면 그림 파일은 지운다
+            IconFile.DeleteImported(BagStore.Resolve(bag, stored), BagStore.BagDir(bag.Id));
+        bag.TabIcon = null;
+        bag.TabEmoji = emoji;
+        Save(bag);
+        RefreshSelected();
+    }
+
+    private void EmojiApply_Click(object sender, RoutedEventArgs e)
+    {
+        if (TabEmoji.Extract(EmojiInput.Text) is { } emoji)
+            SetEmoji(emoji);
+        else
+            ShowMessage("이모티콘 하나를 입력해 주세요.\nWin + . 키를 누르면 이모티콘을 고를 수 있습니다.", MessageBoxImage.Information);
+    }
+
+    private void EmojiInput_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+    {
+        if (e.Key == System.Windows.Input.Key.Enter)
+            EmojiApply_Click(sender, e);
     }
 
     private void HideName_Click(object sender, RoutedEventArgs e)

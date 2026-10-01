@@ -38,6 +38,8 @@
   <ItemGroup>
     <!-- Pretendard(SIL OFL 1.1)를 exe 안에 넣는다. 라이선스 전문은 assets\fonts\OFL.txt (설치 폴더에도 복사) -->
     <Resource Include="assets\fonts\*.otf" />
+    <!-- 탭 아이콘용 이모티콘 그림(Microsoft Fluent Emoji 3D, MIT). 라이선스 전문은 assets\emoji\LICENSE (설치 폴더에도 복사) -->
+    <Resource Include="assets\emoji\*.png" />
   </ItemGroup>
 
   <ItemGroup>

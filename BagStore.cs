@@ -22,6 +22,7 @@ public sealed class Bag
     public int Rows { get; set; } = DefaultSide;
     public bool HideName { get; set; }      // 탭 아이콘이 있을 때 탭 이름을 숨긴다
     public string? TabIcon { get; set; }    // 가방 폴더 기준 상대 경로 또는 exe·dll 절대 경로
+    public string? TabEmoji { get; set; }   // 탭 아이콘으로 쓰는 이모티콘 하나. TabIcon과 둘 중 하나만 쓴다
     public string? Theme { get; set; }      // null = 전체 설정 따르기, system / light / dark / custom
     public string? Color { get; set; }      // 커스텀 테마 색 (#RRGGBB)
     public List<Slot> Slots { get; set; } = new();

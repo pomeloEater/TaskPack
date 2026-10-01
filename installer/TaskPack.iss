@@ -74,6 +74,7 @@ Type: filesandordirs; Name: "{app}\zh-Hant"; Check: IsExistingInstall
 Source: "{#PublishDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\LICENSE"; DestDir: "{app}\licenses"; DestName: "TaskPack-LICENSE.txt"; Flags: ignoreversion
 Source: "..\assets\fonts\OFL.txt"; DestDir: "{app}\licenses"; DestName: "Pretendard-OFL.txt"; Flags: ignoreversion
+Source: "..\assets\emoji\LICENSE"; DestDir: "{app}\licenses"; DestName: "FluentEmoji-LICENSE.txt"; Flags: ignoreversion
 
 [Icons]
 Name: "{autoprograms}\{#AppName}"; Filename: "{app}\{#AppExe}"; AppUserModelID: "{#AppUserModelId}"

@@ -265,18 +265,21 @@ public partial class BagWindow : Window
     private Border CreateTab(Bag bag)
     {
         var content = new StackPanel { Orientation = Orientation.Horizontal };
-        var icon = bag.TabIcon is { } stored ? ShellIcons.LoadIconFile(BagStore.Resolve(bag, stored)) : null;
+        // 탭 아이콘: 이모티콘이 있으면 그것, 없으면 그림 파일
+        FrameworkElement? icon = TabEmoji.CreateVisual(bag.TabEmoji, 16);
+        if (icon is null && bag.TabIcon is { } stored && ShellIcons.LoadIconFile(BagStore.Resolve(bag, stored)) is { } source)
+        {
+            var image = new Image { Source = source, Width = 16, Height = 16 };
+            RenderOptions.SetBitmapScalingMode(image, BitmapScalingMode.HighQuality);
+            icon = image;
+        }
         var nameHidden = bag.HideName && icon is not null && bag != _editingBag;
 
         if (icon is not null)
         {
-            var image = new Image
-            {
-                Source = icon, Width = 16, Height = 16, VerticalAlignment = VerticalAlignment.Center,
-                Margin = new Thickness(0, 0, nameHidden ? 0 : 6, 0),
-            };
-            RenderOptions.SetBitmapScalingMode(image, BitmapScalingMode.HighQuality);
-            content.Children.Add(image);
+            icon.VerticalAlignment = VerticalAlignment.Center;
+            icon.Margin = new Thickness(0, 0, nameHidden ? 0 : 6, 0);
+            content.Children.Add(icon);
         }
 
         if (bag == _editingBag)

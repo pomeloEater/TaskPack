@@ -95,14 +95,21 @@
                                 <StackPanel>
                                     <TextBlock Text="탭 아이콘" Style="{StaticResource FieldLabel}"/>
                                     <StackPanel Orientation="Horizontal">
-                                        <Border Width="44" Height="44" CornerRadius="8" Background="{DynamicResource SlotHoverBrush}" Margin="0,0,12,0">
-                                            <Image x:Name="TabIconImage" Width="28" Height="28" RenderOptions.BitmapScalingMode="HighQuality"/>
-                                        </Border>
-                                        <Button x:Name="TabIconButton" Style="{StaticResource SecondaryButton}" Padding="12,6"
-                                                VerticalAlignment="Center" Click="TabIcon_Click"/>
+                                        <Border x:Name="TabIconPreview" Width="44" Height="44" CornerRadius="8" Background="{DynamicResource SlotHoverBrush}" Margin="0,0,12,0"/>
                                         <Button x:Name="TabIconRemoveButton" Content="삭제" Style="{StaticResource SecondaryButton}" Padding="12,6"
-                                                VerticalAlignment="Center" Margin="6,0,0,0" Click="TabIconRemove_Click"/>
+                                                VerticalAlignment="Center" Click="TabIconRemove_Click"/>
                                     </StackPanel>
+                                    <WrapPanel x:Name="EmojiPanel" Margin="0,12,0,0"/>
+                                    <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                        <TextBlock Text="직접 입력" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                        <TextBox x:Name="EmojiInput" Width="64" Padding="6,4" FontFamily="Segoe UI Emoji, Segoe UI Symbol"
+                                                 VerticalContentAlignment="Center" KeyDown="EmojiInput_KeyDown"/>
+                                        <Button Content="넣기" Style="{StaticResource SecondaryButton}" Padding="12,5" Margin="6,0,0,0" Click="EmojiApply_Click"/>
+                                    </StackPanel>
+                                    <TextBlock Style="{StaticResource Note}"
+                                               Text="목록에 없는 이모티콘은 Win + . 키로 입력하세요. 컬러 글꼴을 그릴 수 없어 탭 글자색 한 가지로 보입니다."/>
+                                    <Button x:Name="TabIconButton" Content="그림 파일에서 고르기…" Style="{StaticResource SecondaryButton}" Padding="12,6"
+                                            HorizontalAlignment="Left" Margin="0,12,0,0" Click="TabIcon_Click"/>
                                     <CheckBox x:Name="HideNameSwitch" Style="{StaticResource Switch}" Margin="0,14,0,0"
                                               Content="탭에 이름을 숨기고 아이콘만 보이기" Click="HideName_Click"/>
                                 </StackPanel>
